@@ -1,0 +1,14 @@
+{
+  "name": "eeg-backend",
+  "version": "1.0.0",
+  "description": "routing for backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Zain Bokhari",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

@@ -1,16 +1,21 @@
-const express = require("express");
-const app = express();
-var path = require("path");
+import express from "express";
+import { dirname, join } from "path";
+import loginRoute from "./routes/login.js";
+import { fileURLToPath } from "url";
 
-const loginRoute = require("./routes/login");
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const app = express();
 
 app.use("/login", loginRoute);
 
-//landing page?
-app.get("/", (req, res) => {
-  res.sendFile(path.resolve(__dirname + "/../frontend/public/index.html"));
+console.log(__dirname);
+
+// All client pages
+app.get("*", (req, res) => {
+  res.sendFile(join(__dirname, "/../frontend/build/index.html"));
 });
 
 app.listen(3000, () => {
-  console.log("backend/app.js running on port 3000");
+  console.log("Backend running on http://localhost:3000");
 });

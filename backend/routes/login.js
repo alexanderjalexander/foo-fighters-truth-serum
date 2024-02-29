@@ -2,10 +2,19 @@ import { Router } from "express";
 
 const router = Router();
 
-router.get("/", (req, res) => {
-  //but actually serve a login page.
+//for logging in
+router.post("/", (req, res) => {
   console.log("went to login");
-  res.json({ test: "success" });
+  const { username, password } = req.body;
+  //things with mongodb to be done
+
+  // if(authenticationFunction){
+  //   req.session.user = { UID }; //altered with db stuff
+  //   res.status(200).send("successfully logged in")
+  // }
+  // else{
+  //   res.status(400).send("incorrect credentials")
+  // }
 });
 
 export default router;

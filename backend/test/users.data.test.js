@@ -4,7 +4,7 @@ import { createUser, verifyUser } from "../data/users.js";
 import { closeConnection, users } from '../config/mongo.js';
 
 beforeEach(async () => {
-  (await users()).deleteMany({});
+  await (await users()).deleteMany({});
 })
 
 afterAll(async () => {

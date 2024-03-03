@@ -6,17 +6,22 @@ const Login = (props) => {
     const [password, setPassword] = useState('')
     const [emailError, setEmailError] = useState('')
     const [passwordError, setPasswordError] = useState('')
+
     const navigate = useNavigate();
 
     const onLogin = () => {
         // Will contain routing implementations to log in
     }
 
+    const register = () => {
+        navigate('/register');
+    }
+
     return (
         <div className="max-w-3/5">
-            <title>Login</title>
+            <title>Log In</title>
             <header>
-                Login
+                Log In
             </header>
             <div class="mb-3">
                 <label htmlFor="exampleFormControlInput1" className="form-label">Email address</label>
@@ -30,6 +35,11 @@ const Login = (props) => {
                     className="btn btn-primary"
                     onClick={onLogin}>
                 Login
+            </button>
+            <button type="button"
+                    className="btn btn-secondary"
+                    onClick={register}>
+                Register
             </button>
         </div>
     )

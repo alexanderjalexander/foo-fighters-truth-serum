@@ -15,6 +15,10 @@ const Home = (props) => {
         }
     }
 
+    const register = () => {
+        navigate('/register');
+    }
+
     if (loggedIn) {
         return (
             <div>
@@ -34,6 +38,11 @@ const Home = (props) => {
                        class="btn btn-primary"
                        onClick={ loginHandler }
                        value="Log In"
+                />
+                <input type="button"
+                       className="btn btn-primary"
+                       onClick={ register }
+                       value="Register"
                 />
             </div>
         )

@@ -9,8 +9,10 @@ const Home = (props) => {
 
     const loginHandler = () => {
         if (loggedIn) {
+            // Logged in, log the user out
 
         } else {
+            // Logged out, start flow for logging in
             navigate('/login');
         }
     }
@@ -35,12 +37,12 @@ const Home = (props) => {
             <div>
                 <header>Welcome!</header>
                 <input type="button"
-                       class="btn btn-primary"
+                       class="btn btn-primary d-block"
                        onClick={ loginHandler }
                        value="Log In"
                 />
                 <input type="button"
-                       className="btn btn-primary"
+                       className="btn btn-primary d-block"
                        onClick={ register }
                        value="Register"
                 />

@@ -2,9 +2,9 @@ import React, {useState} from 'react';
 import {useNavigate} from "react-router-dom";
 
 const Register = (props) => {
-    const [email, setEmail] = useState('')
+    const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const [emailError, setEmailError] = useState('')
+    const [usernameError, setUsernameError] = useState('')
     const [passwordError, setPasswordError] = useState('')
 
     const navigate = useNavigate();
@@ -24,8 +24,8 @@ const Register = (props) => {
                 Register
             </header>
             <div class="mb-3">
-                <label htmlFor="exampleFormControlInput1" className="form-label">Email address</label>
-                <input type="email" className="form-control" id="exampleFormControlInput1" placeholder="name@example.com"></input>
+                <label htmlFor="exampleFormControlInput1" className="form-label">Username</label>
+                <input type="email" className="form-control" id="exampleFormControlInput1" placeholder="Enter Username Here"></input>
             </div>
             <div className="mb-3">
                 <label htmlFor="inputPassword" className="form-label">Password</label>

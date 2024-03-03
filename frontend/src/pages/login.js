@@ -17,30 +17,45 @@ const Login = (props) => {
         navigate('/register');
     }
 
+    const back = () => {
+        navigate('/');
+    }
+
     return (
-        <div className="max-w-3/5">
+        <div className="d-flex flex-row gap-2 vh-100 justify-content-center align-items-center">
             <title>Log In</title>
-            <header>
-                Log In
-            </header>
-            <div class="mb-3">
-                <label htmlFor="exampleFormControlInput1" className="form-label">Username</label>
-                <input type="email" className="form-control" id="exampleFormControlInput1" placeholder="Enter Username Here"></input>
+            <div>
+                <header className="fs-1 text-center">
+                    Log In
+                </header>
+                <div className="mb-3">
+                    <label htmlFor="exampleFormControlInput1" className="form-label">Username</label>
+                    <input type="email" className="form-control" id="exampleFormControlInput1" placeholder="Enter Username Here"></input>
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="inputPassword" className="form-label">Password</label>
+                    <input type="password" className="form-control" id="inputPassword" placeholder="Enter Password Here"></input>
+                </div>
+                <div class="d-flex justify-content-around align-items-center">
+                    <button type="button"
+                            className="btn btn-lg btn-outline-dark"
+                            onClick={register}>
+                        Register
+                    </button>
+                    <button type="button"
+                            className="btn btn-lg btn-primary"
+                            onClick={onLogin}>
+                        Login
+                    </button>
+                </div>
+                <div class="d-flex w-100 m-2 justify-content-around align-items-center">
+                    <button type="button"
+                            className="btn"
+                            onClick={back}>
+                        Back
+                    </button>
+                </div>
             </div>
-            <div className="mb-3">
-                <label htmlFor="inputPassword" className="form-label">Password</label>
-                <input type="password" className="form-control" id="inputPassword" placeholder="Enter Password Here"></input>
-            </div>
-            <button type="button"
-                    className="btn btn-primary"
-                    onClick={onLogin}>
-                Login
-            </button>
-            <button type="button"
-                    className="btn btn-secondary"
-                    onClick={register}>
-                Register
-            </button>
         </div>
     )
 }

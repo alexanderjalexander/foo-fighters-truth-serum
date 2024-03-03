@@ -1,20 +1,17 @@
 import { Router } from "express";
+import { verifyUser } from "../data/users.js";
 
 const router = Router();
 
 //for logging in
-router.post("/", (req, res) => {
-  console.log("went to login");
-  const { username, password } = req.body;
-  //things with mongodb to be done
-
-  // if(authenticationFunction){
-  //   req.session.user = { UID }; //altered with db stuff
-  //   res.status(200).send("successfully logged in")
-  // }
-  // else{
-  //   res.status(400).send("incorrect credentials")
-  // }
+router.post("/", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    await verifyUser(email, password);
+    res.status(200).json({ message: "Succesfully logged in" });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
 export default router;

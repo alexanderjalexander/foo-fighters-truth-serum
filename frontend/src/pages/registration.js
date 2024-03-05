@@ -8,7 +8,7 @@ const Register = (props) => {
     const [emailError, setEmailError] = useState('')
     function updateEmail(em) {
         setEmail(em);
-        setEmailError(checkEmail(em));
+        setEmailError('');
         setRegisMessage('');
         setServerError('');
     }
@@ -81,6 +81,7 @@ const Register = (props) => {
                     <label htmlFor="inputEmail" className="form-label">Email</label>
                     <input aria-label="Email Box"
                            value={email}
+                           onBlur={e => setEmailError(checkEmail(email))}
                            onChange={e => updateEmail(e.target.value)}
                            className="form-control" data-testid="inputEmail"
                            placeholder="Enter Email Here"></input>

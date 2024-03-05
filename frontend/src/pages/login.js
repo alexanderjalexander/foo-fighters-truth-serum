@@ -5,20 +5,19 @@ import {checkEmail, checkPassword} from "../components/validation";
 import {useMutation} from "@tanstack/react-query";
 
 const Login = (props) => {
-    const [email, setEmail] = useState('')
-    const [emailError, setEmailError] = useState('')
+    const [loginMessage, setLoginMessage] = useState('')
+    const [serverError, setServerError] = useState('')
+
+    const [email, setEmail] = useState('');
     function updateEmail(em) {
         setEmail(em);
-        setEmailError(checkEmail(em));
         setLoginMessage('');
         setServerError('');
     }
 
-    const [password, setPassword] = useState('')
-    const [passwordError, setPasswordError] = useState('')
+    const [password, setPassword] = useState('');
     function updatePassword(ps) {
         setPassword(ps);
-        setPasswordError(checkPassword(ps));
         setLoginMessage('');
         setServerError('');
     }
@@ -27,9 +26,6 @@ const Login = (props) => {
     const navigate = useNavigate();
 
     const {user, setUser} = useContext(UserContext);
-
-    const [loginMessage, setLoginMessage] = useState('')
-    const [serverError, setServerError] = useState('')
 
     const FormMutation = useMutation({
         mutationFn: () => {
@@ -89,7 +85,6 @@ const Login = (props) => {
                            onChange={e => updateEmail(e.target.value)}
                            className="form-control" data-testid="inputEmail"
                            placeholder="Enter Email Here"></input>
-                    {emailError !== "" ? <label className="text-danger">{emailError}</label>: <div></div>}
                 </div>
 
                 <div className="mb-3">
@@ -99,7 +94,6 @@ const Login = (props) => {
                            onChange={e => updatePassword(e.target.value)}
                            className="form-control" data-testid="inputPassword"
                            placeholder="Enter Password Here"></input>
-                    {passwordError !== "" ? <label className="text-danger">{passwordError}</label>: <div></div>}
                 </div>
 
                 <div>

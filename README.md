@@ -22,3 +22,11 @@ DATABASE|string|The name of the database to connect to.
 1. Run `npm run build` in the `frontend` directory
 2. Run `npm start` in the `backend` directory
 3. The application should now be available at `http://localhost:4000/`
+
+## Testing
+
+### Backend
+Backend tests can be run by running `npm test` in the `backend` directory.
+
+### Frontend
+Frontend tests can be run by running `npm test` in the `frontend` directory.

@@ -48,8 +48,14 @@ configRoutes(app);
 app.get("*", (req, res) => {
   res.sendFile(join(__dirname, "/../frontend/build/index.html"));
 });
-app.listen(4000, () => {
-  console.log("Backend running on http://localhost:4000");
+
+let server = app.listen(4000, () => {
+  console.log(`App started at http://localhost:4000`);
 });
 
-export default app;
+
+const closeServer = async () => {
+  await server.close();
+}
+
+export { app, closeServer };

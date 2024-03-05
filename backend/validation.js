@@ -1,3 +1,5 @@
+import { ObjectId } from "mongodb";
+
 /**
  * Asserts that a value is of type string. Errors if it isn't.
  * @param {any} value Value to assert a string type on.
@@ -10,6 +12,18 @@ export const requireString = (value, name, trim = true) => {
     throw new Error(`${name} must be a non-empty string.`);
   return value;
 };
+
+/**
+ * Asserts that a value is of type ObjectId or equivalent. Errors if it isn't.
+ * @param {string|ObjectId} value Value to assert an ObjectId type on.
+ * @param {string} name Name of parameter for error messages.
+ * @returns {ObjectId} The value coerced to an ObjectId.
+ */
+export const requireId = (value, name) => {
+  if (!value || !ObjectId.isValid(value))
+    throw new Error(`${name} must be a valid ID.`);
+  return new ObjectId(value);
+}
 
 /**
  * Validates an email address. Errors if invalid.
@@ -56,3 +70,15 @@ export const stringifyId = (obj) => {
   }
   return obj;
 };
+
+/**
+ * Checks that a person's name is valid. Errors if it isn't.
+ * @param {string} name The name to check.
+ * @returns {string} The trimmed name.
+ */
+export const checkPersonName = (name) => {
+  name = requireString(name, 'Person name');
+  if (name.length < 3)
+    throw new Error('Person name must be at least 3 characters long.');
+  return name;
+}

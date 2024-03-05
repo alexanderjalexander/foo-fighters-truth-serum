@@ -1,0 +1,180 @@
+import { ObjectId } from "mongodb";
+import { users } from "../config/mongo.js";
+import { checkPersonName, requireId, stringifyId } from "../validation.js";
+import { getUserById } from "./users.js";
+
+/**
+ * @typedef Person
+ * @property {ObjectId} _id The ObjectID for this Person
+ * @property {string} name The name of this Person
+ * @property {any[]} detections The detections stored on this Person 
+ */
+
+/**
+ * Gets a Person from a given User.
+ * @param {string|ObjectId} userId The ID of the User with the Person.
+ * @param {string} personName The name of the Person to get.
+ * @returns {Promise<Person?>} The Person, or null if they couldn't be found.
+ */
+export const getPersonByName = async (userId, personName) => {
+  userId = requireId(userId);
+
+  if (!(await getUserById(userId)))
+    throw new Error('User does not exist.');
+
+  const usersCol = await users();
+  const userPerson = await usersCol.findOne(
+    {
+      _id: userId,
+      people: { 
+        $elemMatch: {
+          name: personName
+        }
+      }
+    },
+    {
+      projection: {
+        "people.$": 1
+      }
+    }
+  );
+
+  return userPerson ? stringifyId(userPerson.people[0]) : null;
+};
+
+/**
+ * Gets a Person from a given User.
+ * @param {string|ObjectId} userId The ID of the User that has the Person.
+ * @param {string|ObjectId} personId The ID of the Person to get.
+ * @returns {Promise<Person?>} The Person, or null if they couldn't be found.
+ */
+export const getPersonById = async (userId, personId) => {
+  userId = requireId(userId);
+
+  if (!(await getUserById(userId)))
+    throw new Error('User does not exist.');
+
+  const usersCol = await users();
+  const userPerson = await usersCol.findOne(
+    {
+      _id: userId,
+      people: { 
+        $elemMatch: {
+          _id: personId
+        }
+      }
+    },
+    {
+      projection: {
+        "people.$": 1
+      }
+    }
+  );
+
+  return userPerson ? stringifyId(userPerson.people[0]) : null;
+};
+
+/**
+ * Creates a new Person on a given User with a given name.
+ * @param {string|ObjectId} userId The ID of the user to create the Person on.
+ * @param {string} personName The name to give the new Person.
+ * @returns {Promise<Person>} The created Person.
+ */
+export const createPerson = async (userId, personName) => {
+  userId = requireId(userId, 'User ID');
+  personName = checkPersonName(personName);
+
+  if (!(await getUserById(userId)))
+    throw new Error('User does not exist.');
+
+  if (await getPersonByName(userId, personName))
+    throw new Error('A person with that name exists already.');
+
+  const person = {
+    _id: new ObjectId(),
+    name: personName,
+    detections: []
+  };
+
+  const usersCol = await users();
+  const res = await usersCol.updateOne(
+    { _id: userId },
+    { $push: { people: person } }
+  );
+  if (!res.acknowledged)
+    throw new Error('Failed to add person to user.');
+
+  return stringifyId(person);
+};
+
+/**
+ * Updates a Person's name.
+ * @param {string|ObjectId} userId The ID of the User that contains the Person.
+ * @param {string|ObjectId} personId The ID of the Person to modify.
+ * @param {string} newName The new name for the Person.
+ * @returns {Promise<import("./users.js").User>} The updated User data.
+ */
+export const renamePerson = async (userId, personId, newName) => {
+  userId = requireId(userId, 'User ID');
+  personId = requireId(personId, 'Person ID');
+  newName = checkPersonName(newName);
+
+  if (!(await getPersonById(userId, personId)))
+    throw new Error('Person does not exist.');
+
+  const usersCol = await users();
+  const res = await usersCol.updateOne(
+    {
+      _id: userId,
+      people: {
+        $elemMatch: {
+          _id: personId
+        }
+      }
+    },
+    {
+      $set: {
+        "people.$.name": newName
+      }
+    }
+  );
+
+  if (!res.acknowledged)
+    throw new Error('Failed to update person\'s name.');
+
+  return await getUserById(userId);
+};
+
+/**
+ * Deletes a Person from a User.
+ * @param {string|ObjectId} userId The ID of the user containing the person.
+ * @param {string|ObjectId} personId The ID of the person to delete.
+ * @returns {Promise<import("./users.js").User>} The updated User data.
+ */
+export const deletePerson = async (userId, personId) => {
+  userId = requireId(userId, 'User ID');
+  personId = requireId(personId, 'Person ID');
+
+  if (!(await getPersonById(userId, personId)))
+    throw new Error('Person does not exist.');
+
+  const usersCol = await users();
+  const res = await usersCol.updateOne(
+    {
+      _id: userId,
+      people: {
+        $elemMatch: {
+          _id: personId
+        }
+      }
+    },
+    {
+      $pull: "people.$"
+    }
+  );
+
+  if (!res.acknowledged)
+    throw new Error('Failed to delete person.');
+
+  return await getUserById(userId);
+};

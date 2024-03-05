@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { users } from "../config/mongo.js";
-import { checkPassword, checkEmail, stringifyId } from "../validation.js";
+import { checkPassword, checkEmail, stringifyId, requireId } from "../validation.js";
 
 /**
  * @typedef User
@@ -51,4 +51,16 @@ export const verifyUser = async (email, password) => {
   const user = await usersCol.findOne({ email });
   if (!user) return null;
   return (await bcrypt.compare(password, user.hash)) ? stringifyId(user) : null;
-}
+};
+
+/**
+ * Gets a user by a specific ID.
+ * @param {string|import("mongodb").ObjectId} userId The user ID to lookup a user by.
+ * @returns {Promise<User?>} The requested user, or null if they don't exist.
+ */
+export const getUserById = async (userId) => {
+  userId = requireId(userId);
+
+  const usersCol = await users();
+  return await usersCol.findOne({ _id: userId });
+};

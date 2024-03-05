@@ -12,7 +12,6 @@ let _db;
  */
 export const dbConnection = async () => {
   if (!_conn) {
-    console.log('creating connection');
     _conn = await MongoClient.connect(process.env.CONNECTION_URI);
     _db = _conn.db(process.env.DATABASE);
   }
@@ -26,7 +25,7 @@ export const dbConnection = async () => {
 export const closeConnection = async () => {
   if (_conn)
     await _conn.close(true);
-  // _conn = null;
+  _conn = null;
   _db = null;
 };
 

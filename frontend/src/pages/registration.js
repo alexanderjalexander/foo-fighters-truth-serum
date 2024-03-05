@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import {checkEmail, checkPassword} from "../components/validation";
 import {useMutation} from "@tanstack/react-query";
+import './pages.css';
 
 const Register = (props) => {
     const [email, setEmail] = useState('')
@@ -72,7 +73,7 @@ const Register = (props) => {
     return (
         <div className="d-flex flex-row vh-100 justify-content-center align-items-center">
             <title>Register</title>
-            <div>
+            <div className="container-sm-only">
                 <header className="fs-1 text-center">
                     Register
                 </header>

@@ -1,8 +1,8 @@
 import React, {useContext, useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import {UserContext} from "../components/UserContext";
-import {checkEmail, checkPassword} from "../components/validation";
 import {useMutation} from "@tanstack/react-query";
+import './pages.css';
 
 const Login = (props) => {
     const [loginMessage, setLoginMessage] = useState('')
@@ -73,7 +73,7 @@ const Login = (props) => {
     return (
         <div className="d-flex flex-row gap-2 vh-100 justify-content-center align-items-center">
             <title>Log In</title>
-            <div>
+            <div className="container-sm-only">
                 <header className="fs-1 text-center">
                     Log In
                 </header>

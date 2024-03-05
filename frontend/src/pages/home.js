@@ -40,7 +40,7 @@ const Home = (props) => {
         return (
             <div className="d-flex vh-100 text-center justify-content-center align-items-center">
                 <div>
-                    <header className="fs-1">Foo Fighters EEG</header>
+                    <header className="fs-1">Truth Serum EEG</header>
                     <input type="button"
                            className="btn btn-lg btn-primary m-2 sd-inline"
                            onClick={ loginHandler }

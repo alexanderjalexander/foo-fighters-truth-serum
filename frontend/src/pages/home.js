@@ -3,7 +3,6 @@ import {useNavigate} from "react-router-dom";
 
 const Home = (props) => {
     const [loggedIn, setLoggedIn] = useState(false);
-    const [email, setEmail] = useState('');
 
     const navigate = useNavigate();
 
@@ -11,6 +10,8 @@ const Home = (props) => {
         if (loggedIn) {
             // Logged in, log the user out
 
+
+            setLoggedIn(false);
         } else {
             // Logged out, start flow for logging in
             navigate('/login');
@@ -34,9 +35,9 @@ const Home = (props) => {
         )
     } else {
         return (
-            <div class="d-flex vh-100 text-center justify-content-center align-items-center">
+            <div className="d-flex vh-100 text-center justify-content-center align-items-center">
                 <div>
-                    <header class="fs-1">Foo Fighters EEG</header>
+                    <header className="fs-1">Foo Fighters EEG</header>
                     <input type="button"
                            className="btn btn-lg btn-primary m-2 sd-inline"
                            onClick={ loginHandler }

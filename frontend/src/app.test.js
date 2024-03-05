@@ -18,10 +18,10 @@ test('Renders Home Buttons', () => {
 test('Renders Login Page Fields', () => {
   render(<App />);
   fireEvent.click(screen.getByText("Log In"));
-  const usernameElement = screen.getByText("Username");
-  expect(usernameElement).toBeInTheDocument();
-  const usernameBox = screen.getByRole('textbox', {name: 'Username Box'});
-  expect(usernameBox).toBeInTheDocument();
+  const emailElement = screen.getByText("Email");
+  expect(emailElement).toBeInTheDocument();
+  const emailBox = screen.getByTestId('inputEmail');
+  expect(emailBox).toBeInTheDocument();
   const passwordElement = screen.getByText("Password");
   expect(passwordElement).toBeInTheDocument();
   const passwordBox = screen.getByTestId('inputPassword');
@@ -33,10 +33,10 @@ test('Renders Login Page Fields', () => {
 test('Renders Register Page Fields', () => {
   render(<App />);
   fireEvent.click(screen.getByText("Register"));
-  const usernameElement = screen.getByText("Username");
-  expect(usernameElement).toBeInTheDocument();
-  const usernameBox = screen.getByRole('textbox', {name: 'Username Box'});
-  expect(usernameBox).toBeInTheDocument();
+  const emailElement = screen.getByText("Email");
+  expect(emailElement).toBeInTheDocument();
+  const emailBox = screen.getByTestId('inputEmail');
+  expect(emailBox).toBeInTheDocument();
   const passwordElement = screen.getByText("Password");
   expect(passwordElement).toBeInTheDocument();
   const passwordBox = screen.getByTestId('inputPassword');

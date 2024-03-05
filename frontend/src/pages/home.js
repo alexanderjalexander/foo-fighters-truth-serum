@@ -25,13 +25,15 @@ const Home = (props) => {
 
     if (loggedIn) {
         return (
-            <div>
-                <header>Welcome!</header>
-                <input type="button"
-                       className="btn btn-primary"
-                       onClick={ loginHandler }
-                       value="Log Out"
-                />
+            <div className="d-flex vh-100 text-center justify-content-center align-items-center">
+                <div>
+                    <header className="fs-1">Welcome!</header>
+                    <input type="button"
+                           className="btn btn-lg btn-primary"
+                           onClick={ loginHandler }
+                           value="Log Out"
+                    />
+                </div>
             </div>
         )
     } else {

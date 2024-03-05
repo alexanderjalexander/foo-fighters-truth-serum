@@ -38,6 +38,12 @@ const Register = (props) => {
         }
     })
 
+    const navigate = useNavigate();
+
+    const login = () => {
+        navigate('/login');
+    }
+
     const onRegister = async () => {
         setRegisMessage('');
         setServerError('');
@@ -55,15 +61,9 @@ const Register = (props) => {
             console.log("Registration Form Mutation Succeeded");
             if (result.status === 200) {
                 console.log(result.message);
-                setRegisMessage('Registration successful! Head over to the Log In page to access the app.')
+                login();
             }
         }
-    }
-
-    const navigate = useNavigate();
-
-    const login = () => {
-        navigate('/login');
     }
 
     const back = () => {
@@ -74,7 +74,8 @@ const Register = (props) => {
         <div className="d-flex flex-row vh-100 justify-content-center align-items-center">
             <title>Register</title>
             <div className="container-sm-only">
-                <header className="fs-1 text-center">
+                <header data-testid="registerHeader"
+                    className="fs-1 text-center">
                     Register
                 </header>
 
@@ -106,11 +107,13 @@ const Register = (props) => {
 
                 <div className="d-flex justify-content-around align-items-center">
                     <button type="button"
+                            data-testid="loginButton"
                             className="btn btn-lg btn-outline-dark d-block"
                             onClick={login}>
                         Log In
                     </button>
                     <button type="button"
+                            data-testid="registerButton"
                             className="btn btn-lg btn-primary d-block"
                             onClick={onRegister}>
                         Register

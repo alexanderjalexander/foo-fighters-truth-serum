@@ -50,7 +50,7 @@ const Login = (props) => {
             if (result.status === 500) {
                 setServerError(`An error occurred sending your request: ${FormMutation.error}`);
             } else if (result.status === 400) {
-                setServerError(`Registration Error: ${response.error}`)
+                setServerError(`Registration Error: ${response.message}`)
             }
         } else {
             console.log("Login Form Mutation Succeeded");
@@ -74,7 +74,8 @@ const Login = (props) => {
         <div className="d-flex flex-row gap-2 vh-100 justify-content-center align-items-center">
             <title>Log In</title>
             <div className="container-sm-only">
-                <header className="fs-1 text-center">
+                <header data-testid="loginHeader"
+                    className="fs-1 text-center">
                     Log In
                 </header>
 
@@ -109,6 +110,7 @@ const Login = (props) => {
                     </button>
                     <button type="button"
                             className="btn btn-lg btn-primary"
+                            data-testid="loginButton"
                             onClick={onLogin}>
                         Login
                     </button>

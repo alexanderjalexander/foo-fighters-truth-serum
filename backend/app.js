@@ -48,6 +48,6 @@ configRoutes(app);
 app.get("*", (req, res) => {
   res.sendFile(join(__dirname, "/../frontend/build/index.html"));
 });
-app.listen(3000, () => {
-  console.log("Backend running on http://localhost:3000");
+app.listen(4000, () => {
+  console.log("Backend running on http://localhost:4000");
 });

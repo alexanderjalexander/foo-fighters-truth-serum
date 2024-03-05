@@ -3,9 +3,9 @@ import loginRoute from "./login.js";
 import privateRoute from "./private.js";
 
 const constructorMethod = (app) => {
-  app.use("/login", loginRoute);
-  app.use("/registration", registrationRoute);
-  app.use("/private", privateRoute);
+  app.use("/api/login", loginRoute);
+  app.use("/api/registration", registrationRoute);
+  app.use("/api/private", privateRoute);
 };
 
 export default constructorMethod;

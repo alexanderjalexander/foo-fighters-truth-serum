@@ -1,17 +1,32 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {useNavigate} from "react-router-dom";
+import {UserContext} from "../components/UserContext";
+import {checkEmail, checkPassword} from "../components/validation";
 
 const Login = (props) => {
     const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
     const [emailError, setEmailError] = useState('')
+    function updateEmail(em) {
+        setEmail(em);
+        setEmailError(checkEmail(em));
+    }
+
+    const [password, setPassword] = useState('')
     const [passwordError, setPasswordError] = useState('')
+    function updatePassword(ps) {
+        setPassword(ps);
+        setPasswordError(checkPassword(ps));
+    }
+
     const [serverError, setServerError] = useState('')
 
     const navigate = useNavigate();
 
-    const onLogin = () => {
+    const {user, setUser} = useContext(UserContext);
+
+    const onLogin = async () => {
         // Will contain routing implementations to log in
+
     }
 
     const register = () => {
@@ -33,14 +48,22 @@ const Login = (props) => {
 
                 <div className="mb-3">
                     <label htmlFor="inputEmail" className="form-label">Email</label>
-                    <input aria-label="Email Box" className="form-control" data-testid="inputEmail"
+                    <input aria-label="Email Box"
+                           value={email}
+                           onChange={e => updateEmail(e.target.value)}
+                           className="form-control" data-testid="inputEmail"
                            placeholder="Enter Email Here"></input>
+                    {emailError !== "" ? <label className="text-danger">{emailError}</label>: <div></div>}
                 </div>
 
                 <div className="mb-3">
                     <label htmlFor="inputPassword" className="form-label">Password</label>
-                    <input aria-label="Password Box" type="password" className="form-control" data-testid="inputPassword"
+                    <input aria-label="Password Box" type="password"
+                           value={password}
+                           onChange={e => updatePassword(e.target.value)}
+                           className="form-control" data-testid="inputPassword"
                            placeholder="Enter Password Here"></input>
+                    {passwordError !== "" ? <label className="text-danger">{passwordError}</label>: <div></div>}
                 </div>
 
 

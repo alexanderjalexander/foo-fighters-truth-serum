@@ -1,17 +1,18 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {useNavigate} from "react-router-dom";
+import {UserContext} from "../components/UserContext";
 
 const Home = (props) => {
-    const [loggedIn, setLoggedIn] = useState(false);
+    const {user, setUser} = useContext(UserContext);
+    const [loggedIn, setLoggedIn] = useState(!!user);
 
     const navigate = useNavigate();
 
     const loginHandler = () => {
         if (loggedIn) {
             // Logged in, log the user out
-
-
             setLoggedIn(false);
+            setUser(null);
         } else {
             // Logged out, start flow for logging in
             navigate('/login');

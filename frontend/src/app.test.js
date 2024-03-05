@@ -1,6 +1,5 @@
 import {fireEvent, render, screen} from '@testing-library/react';
 import App from './app';
-import Home from "./pages/home";
 
 test('Renders Home Title', () => {
   render(<App />);

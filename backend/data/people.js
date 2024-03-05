@@ -162,14 +162,14 @@ export const deletePerson = async (userId, personId) => {
   const res = await usersCol.updateOne(
     {
       _id: userId,
-      people: {
-        $elemMatch: {
+      "people._id": personId
+    },
+    {
+      $pull: {
+        people: {
           _id: personId
         }
       }
-    },
-    {
-      $pull: "people.$"
     }
   );
 

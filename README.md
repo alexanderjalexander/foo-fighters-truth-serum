@@ -5,9 +5,20 @@
 This is a platform for ML-powered lie detection using data from an EEG machine.
 
 ## Setup
-The backend needs a few environment variables to run. They are as follows:
+
+### Installation
+1. Run `npm i` in the `backend` directory
+2. Run `npm i` in the `frontend` directory
+
+### Environment
+The backend needs a few environment variables to run. `.env` files will be automatically loaded if present. The required variables are as follows:
 
 Variable|Type|Description
 -|-|-
 CONNECTION_URI|string|A MongoDB connection URI.
 DATABASE|string|The name of the database to connect to.
+
+### Running the App
+1. Run `npm run build` in the `frontend` directory
+2. Run `npm start` in the `backend` directory
+3. The application should now be available at `http://localhost:4000/`

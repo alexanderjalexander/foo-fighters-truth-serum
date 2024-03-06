@@ -1,0 +1,4 @@
+.container-sm-only {
+    max-width: min(75vw, 540px);
+    width: 100%;
+}

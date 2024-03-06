@@ -25,6 +25,9 @@ DATABASE|string|The name of the database to connect to.
 
 ## Testing
 
+### ML Model
+A prediction can be made for a single data sample by using the predict() function, which simply calculates the dot product of the the model's weights and the data sample.
+
 ### Backend
 Backend tests can be run by running `npm test` in the `backend` directory.
 

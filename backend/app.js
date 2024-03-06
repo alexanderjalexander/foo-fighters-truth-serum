@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import configRoutes from "./routes/index.js";
+import { closeConnection } from "./config/mongo.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -42,20 +43,23 @@ app.use("/login", (req, res, next) => {
 
 configRoutes(app);
 
-//console.log(__dirname);
-
 // All client pages
 app.get("*", (req, res) => {
   res.sendFile(join(__dirname, "/../frontend/build/index.html"));
 });
 
-let server = app.listen(4000, () => {
-  console.log(`App started at http://localhost:4000`);
+const server = await new Promise(resolve => {
+  const server = app.listen(4000, () => {
+    console.log(`App started at http://localhost:${server.address().port}`);
+    resolve(server);
+  });
 });
 
-
 const closeServer = async () => {
-  await server.close();
-}
+  await new Promise((resolve, reject) => server.close((err) => {
+    err ? reject(err) : resolve();
+  }));
+  await closeConnection();
+};
 
-export { app, closeServer };
+export { closeServer };

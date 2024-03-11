@@ -47,4 +47,4 @@ const memoCollection = (collection) => {
 };
 
 export const users = memoCollection('users');
-export const people = memoCollection('people');
+export const detections = memoCollection('detections');

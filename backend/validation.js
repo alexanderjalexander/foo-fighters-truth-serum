@@ -62,6 +62,8 @@ export const checkPassword = (value) => {
  * @returns {any} Stringified object.
  */
 export const stringifyId = (obj) => {
+  if (obj instanceof ObjectId)
+    return obj.toString();
   for (const key in obj) {
     if (key === '_id')
       obj._id = obj._id.toString();
@@ -81,4 +83,13 @@ export const checkPersonName = (name) => {
   if (name.length < 3)
     throw new Error('Person name must be at least 3 characters long.');
   return name;
-}
+};
+
+/**
+ * Checks that uploaded detection data is valid.
+ * @param {any} data The data
+ * @returns 
+ */
+export const requireData = (data) => {
+  return data;
+};

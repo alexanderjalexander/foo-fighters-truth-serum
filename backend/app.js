@@ -50,7 +50,8 @@ app.get("*", (req, res) => {
 
 const server = await new Promise(resolve => {
   const server = app.listen(4000, () => {
-    console.log(`App started at http://localhost:${server.address().port}`);
+    if (process.env.NODE_ENV !== 'test')
+      console.log(`App started at http://localhost:${server.address().port}`);
     resolve(server);
   });
 });

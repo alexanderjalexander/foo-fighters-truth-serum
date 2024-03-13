@@ -39,8 +39,8 @@ const Login = (props) => {
         }
     })
 
-    const onLogin = async () => {
-        // Will contain routing implementations to log in
+    const onLogin = async (e) => {
+        e.preventDefault();
         setLoginMessage('');
         setServerError('');
         const result = await FormMutation.mutateAsync(undefined, undefined);
@@ -56,6 +56,7 @@ const Login = (props) => {
             console.log("Login Form Mutation Succeeded");
             if (result.status === 200) {
                 console.log(result.message);
+                console.log(response);
                 setUser(true);
                 navigate('/');
             }
@@ -79,42 +80,43 @@ const Login = (props) => {
                     Log In
                 </header>
 
-                <div className="mb-3">
-                    <label htmlFor="inputEmail" className="form-label">Email</label>
-                    <input aria-label="Email Box"
-                           value={email}
-                           onChange={e => updateEmail(e.target.value)}
-                           className="form-control" data-testid="inputEmail"
-                           placeholder="Enter Email Here"></input>
-                </div>
+                <form onSubmit={onLogin}>
+                    <div className="mb-3">
+                        <label htmlFor="inputEmail" className="form-label">Email</label>
+                        <input aria-label="Email Box"
+                               value={email}
+                               onChange={e => updateEmail(e.target.value)}
+                               className="form-control" data-testid="inputEmail"
+                               placeholder="Enter Email Here"></input>
+                    </div>
 
-                <div className="mb-3">
-                    <label htmlFor="inputPassword" className="form-label">Password</label>
-                    <input aria-label="Password Box" type="password"
-                           value={password}
-                           onChange={e => updatePassword(e.target.value)}
-                           className="form-control" data-testid="inputPassword"
-                           placeholder="Enter Password Here"></input>
-                </div>
+                    <div className="mb-3">
+                        <label htmlFor="inputPassword" className="form-label">Password</label>
+                        <input aria-label="Password Box" type="password"
+                               value={password}
+                               onChange={e => updatePassword(e.target.value)}
+                               className="form-control" data-testid="inputPassword"
+                               placeholder="Enter Password Here"></input>
+                    </div>
 
-                <div>
-                    {loginMessage === '' ? <div></div> : <label>{loginMessage}</label>}
-                    {serverError === '' ? <div></div> : <label className='text-danger'>{serverError}</label>}
-                </div>
+                    <div>
+                        {loginMessage === '' ? <div></div> : <label>{loginMessage}</label>}
+                        {serverError === '' ? <div></div> : <label className='text-danger'>{serverError}</label>}
+                    </div>
 
-                <div className="d-flex justify-content-around align-items-center">
-                    <button type="button"
-                            className="btn btn-lg btn-outline-dark"
-                            onClick={register}>
-                        Register
-                    </button>
-                    <button type="button"
-                            className="btn btn-lg btn-primary"
-                            data-testid="loginButton"
-                            onClick={onLogin}>
-                        Login
-                    </button>
-                </div>
+                    <div className="d-flex justify-content-around align-items-center">
+                        <button type="button"
+                                className="btn btn-lg btn-outline-dark"
+                                onClick={register}>
+                            Register
+                        </button>
+                        <button type="submit"
+                                className="btn btn-lg btn-primary"
+                                data-testid="loginButton">
+                            Login
+                        </button>
+                    </div>
+                </form>
 
 
                 <div className="d-flex w-100 m-2 justify-content-around align-items-center">

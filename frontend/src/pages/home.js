@@ -9,6 +9,7 @@ const Home = (props) => {
     const navigate = useNavigate();
 
     const loginHandler = () => {
+        // Logic to handle the login button for the dashboard.
         if (loggedIn) {
             // Logged in, log the user out
             setLoggedIn(false);
@@ -26,14 +27,12 @@ const Home = (props) => {
     if (loggedIn) {
         return (
             <div className="d-flex vh-100 text-center justify-content-center align-items-center">
-                <div>
-                    <header className="fs-1">Welcome!</header>
-                    <input type="button"
-                           className="btn btn-lg btn-primary"
-                           onClick={ loginHandler }
-                           value="Log Out"
-                    />
-                </div>
+                <header className="fs-1">Welcome!</header>
+                <input type="button"
+                       className="btn btn-lg btn-primary"
+                       onClick={ loginHandler }
+                       value="Log Out"
+                />
             </div>
         )
     } else {

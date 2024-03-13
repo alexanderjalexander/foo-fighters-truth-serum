@@ -1,4 +1,4 @@
-import {BrowserRouter, Route, Routes} from "react-router-dom";
+import {BrowserRouter, redirect, Route, Routes} from "react-router-dom";
 import Home from "./pages/home"
 import Login from "./pages/login"
 import Registration from "./pages/registration"
@@ -16,8 +16,24 @@ function App() {
                 <BrowserRouter>
                     <Routes>
                         <Route path="/" element={<Home />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/register" element={<Registration />} />
+                        <Route path="/login"
+                               element={<Login />}
+                               loader ={async () => {
+                                    if (!!user) {
+                                        return redirect("/");
+                                    }
+                                    return null;
+                               }}
+                        />
+                        <Route path="/register"
+                               element={<Registration />}
+                               loader ={async () => {
+                                   if (!!user) {
+                                       return redirect("/");
+                                   }
+                                   return null;
+                               }}
+                        />
                     </Routes>
                 </BrowserRouter>
             </UserContext.Provider>

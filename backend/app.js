@@ -15,7 +15,7 @@ app.use(
   session({
     name: "sessionCookie",
     secret: "NJTransitFareHikeComingJuly",
-    saveUninitialized: true, //set to true to create a session for testing
+    saveUninitialized: false, //set to true to create a session for testing
     resave: false,
     cookie: { maxAge: 1000 * 60 * 10 }, //10 minutes
   })
@@ -55,23 +55,6 @@ const server = await new Promise(resolve => {
     resolve(server);
   });
 });
-
-
-
-
-// const plantSession = async (userId, user) => {
-//   const sessionStore = new session.MemoryStore();
-//   const session = {
-//     userId,
-//     user
-//   };
-//   if (!await sessionStore.get(userId)) {
-//     await sessionStore.set(userId, session);
-//   }
-//   const sessionId = req.sessionID;
-//   console.log("Session ID:", sessionId);
-//   return session, sessionId;
-// };
 
 
 const closeServer = async () => {

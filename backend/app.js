@@ -21,15 +21,8 @@ app.use(
   })
 );
 
-//prevent from advancing to logged-in utility when not in session.
-app.use("/private", (req, res, next) => {
-  console.log(req.session.id);
-  if (!req.session.user) {
-    return res.redirect("/");
-  } else {
-    next();
-  }
-});
+
+
 
 //prevent login if session active. not needed for /registration
 app.use("/login", (req, res, next) => {

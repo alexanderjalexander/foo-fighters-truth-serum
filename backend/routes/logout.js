@@ -2,9 +2,9 @@ import { Router } from "express";
 
 const router = Router();
 
-//for logging in and out
+//for logging out
 router.post("/", async (req, res) => {
-  if(req.session) {
+  if(req.session.userId) {
     req.session.destroy( (err) => {
       if(err) {
         res.status(400).json({ error: err.message });

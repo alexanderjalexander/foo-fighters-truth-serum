@@ -5,6 +5,7 @@ import logoutRoute from "./logout.js";
 import addNewPersonRoute from "./addNewPerson.js";
 import getAllPeopleRoute from "./getAllPeople.js";
 import getAllDetectionsRoute from "./getAllDetections.js";
+import checkSessionRoute from "./checkSession.js";
 
 const constructorMethod = (app) => {
   app.use("/api/login", loginRoute);
@@ -13,6 +14,7 @@ const constructorMethod = (app) => {
   app.use("/api/addNewPerson", addNewPersonRoute);
   app.use("/api/getAllPeople", getAllPeopleRoute);
   app.use("/api/getAllDetections", getAllDetectionsRoute);
+  app.use("/api/checkSession", checkSessionRoute);
 };
 
 export default constructorMethod;

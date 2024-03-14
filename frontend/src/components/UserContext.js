@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useState} from 'react';
+import React, {createContext, useContext} from 'react';
 import {useQuery} from "@tanstack/react-query";
 
 const UserContext = createContext(null);
@@ -10,7 +10,6 @@ export function useUser() {
 export const AuthWrapper = ({children}) => {
     // await stuff here and then hopefully get stuff back?????
     const {isPending,
-        status,
         error,
         refetch,
         data} = useQuery({

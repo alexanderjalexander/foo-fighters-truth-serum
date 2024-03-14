@@ -1,8 +1,8 @@
 import React, {useContext, useState} from 'react';
 import {useNavigate} from "react-router-dom";
-import {UserContext} from "../components/UserContext";
 import {useMutation} from "@tanstack/react-query";
 import './pages.css';
+import {useUser} from "../components/UserContext";
 
 const Login = (props) => {
     const [loginMessage, setLoginMessage] = useState('')
@@ -22,12 +22,10 @@ const Login = (props) => {
         setServerError('');
     }
 
-
     const navigate = useNavigate();
+    const user = useUser();
 
-    const {user, setUser} = useContext(UserContext);
-
-    const FormMutation = useMutation({
+    const LoginMutation = useMutation({
         mutationFn: () => {
             return fetch('/api/login', {
                 method: 'POST',
@@ -39,16 +37,23 @@ const Login = (props) => {
         }
     })
 
+    const register = () => {
+        navigate('/register');
+    }
+
+    const [buttonDisabled, setButtonDisabled] = useState(false);
+
     const onLogin = async (e) => {
         e.preventDefault();
+        setButtonDisabled(true);
         setLoginMessage('');
         setServerError('');
-        const result = await FormMutation.mutateAsync(undefined, undefined);
+        const result = await LoginMutation.mutateAsync(undefined, undefined);
         const response = await result.json();
         if (!result.ok) {
             console.log("Login Form Mutation Failed");
             if (result.status === 500) {
-                setServerError(`An error occurred sending your request: ${FormMutation.error}`);
+                setServerError(`An error occurred sending your request: ${LoginMutation.error}`);
             } else if (result.status === 400) {
                 setServerError(`Registration Error: ${response.message}`)
             }
@@ -57,15 +62,14 @@ const Login = (props) => {
             if (result.status === 200) {
                 console.log(result.message);
                 console.log(response);
-                setUser(true);
+                await user.refetch();
                 navigate('/');
             }
         }
+        setButtonDisabled(false);
     }
 
-    const register = () => {
-        navigate('/register');
-    }
+
 
     const back = () => {
         navigate('/');
@@ -111,9 +115,10 @@ const Login = (props) => {
                             Register
                         </button>
                         <button type="submit"
+                                disabled={buttonDisabled}
                                 className="btn btn-lg btn-primary"
                                 data-testid="loginButton">
-                            Login
+                            {buttonDisabled ? 'Logging In...' : 'Log In'}
                         </button>
                     </div>
                 </form>

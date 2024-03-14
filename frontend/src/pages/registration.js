@@ -44,8 +44,11 @@ const Register = (props) => {
         navigate('/login');
     }
 
+    const [buttonDisabled, setButtonDisabled] = useState(false);
+
     const onRegister = async (e) => {
         e.preventDefault();
+        setButtonDisabled(true);
         setRegisMessage('');
         setServerError('');
         const result = await FormMutation.mutateAsync(undefined, undefined);
@@ -65,6 +68,7 @@ const Register = (props) => {
                 login();
             }
         }
+        setButtonDisabled(false);
     }
 
     const back = () => {
@@ -115,9 +119,10 @@ const Register = (props) => {
                             Log In
                         </button>
                         <button type="submit"
+                                disabled={buttonDisabled}
                                 data-testid="registerButton"
                                 className="btn btn-lg btn-primary d-block">
-                            Register
+                            {buttonDisabled ? 'Registering...' : 'Register'}
                         </button>
                     </div>
                 </form>

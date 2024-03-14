@@ -80,7 +80,8 @@ const Register = (props) => {
             <title>Register</title>
             <div className="container-sm-only">
                 <header data-testid="registerHeader"
-                    className="fs-1 text-center">
+                        id='registerHeader'
+                        className="fs-1 text-center">
                     Register
                 </header>
 
@@ -91,7 +92,7 @@ const Register = (props) => {
                                value={email}
                                onBlur={e => setEmailError(checkEmail(email))}
                                onChange={e => updateEmail(e.target.value)}
-                               className="form-control" data-testid="inputEmail"
+                               className="form-control" data-testid="inputEmail" id='inputEmail'
                                placeholder="Enter Email Here"></input>
                         {emailError !== "" ? <label className="text-danger">{emailError}</label> : <div></div>}
                     </div>
@@ -101,7 +102,7 @@ const Register = (props) => {
                         <input aria-label="Password Box" type="password"
                                value={password}
                                onChange={e => updatePassword(e.target.value)}
-                               className="form-control" data-testid="inputPassword"
+                               className="form-control" data-testid="inputPassword" id='inputPassword'
                                placeholder="Enter Password Here"></input>
                         {passwordError !== "" ? <label className="text-danger">{passwordError}</label> : <div></div>}
                     </div>
@@ -114,6 +115,7 @@ const Register = (props) => {
                     <div className="d-flex justify-content-around align-items-center">
                         <button type="button"
                                 data-testid="loginButton"
+                                id='loginRedirect'
                                 className="btn btn-lg btn-outline-dark d-block"
                                 onClick={login}>
                             Log In
@@ -121,6 +123,7 @@ const Register = (props) => {
                         <button type="submit"
                                 disabled={buttonDisabled}
                                 data-testid="registerButton"
+                                id='registerButton'
                                 className="btn btn-lg btn-primary d-block">
                             {buttonDisabled ? 'Registering...' : 'Register'}
                         </button>
@@ -130,6 +133,7 @@ const Register = (props) => {
                 <div className="d-flex w-100 m-2 justify-content-around align-items-center">
                     <button type="button"
                             className="btn"
+                            id='backButton'
                             onClick={back}>
                         Back
                     </button>

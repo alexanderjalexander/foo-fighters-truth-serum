@@ -50,7 +50,7 @@ const Home = (props) => {
         return (
             <div>
                 <div className="p-2 d-flex flex-row border border-top-0 border-start-0 border-end-0 border-3 justify-content-between">
-                    <header className="fs-3">Dashboard</header>
+                    <header id='dashboardHeader' className="fs-3">Dashboard</header>
                     <input type="button"
                            className="btn btn-primary"
                            onClick={ loginHandler }
@@ -63,13 +63,15 @@ const Home = (props) => {
         return (
             <div className="d-flex vh-100 text-center justify-content-center align-items-center">
                 <div>
-                    <header className="fs-1">Truth Serum EEG</header>
-                    <input type="button"
+                    <header id='home-title' className="fs-1">Truth Serum EEG</header>
+                    <input id='homeLoginButton'
+                           type="button"
                            className="btn btn-lg btn-primary m-2 sd-inline"
                            onClick={ loginHandler }
                            value="Log In"
                     />
-                    <input type="button"
+                    <input id='homeRegisterButton'
+                           type="button"
                            className="btn btn-lg btn-primary m-2 d-inline"
                            onClick={ register }
                            value="Register"

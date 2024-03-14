@@ -80,7 +80,8 @@ const Login = (props) => {
             <title>Log In</title>
             <div className="container-sm-only">
                 <header data-testid="loginHeader"
-                    className="fs-1 text-center">
+                        id='loginHeader'
+                        className="fs-1 text-center">
                     Log In
                 </header>
 
@@ -90,7 +91,7 @@ const Login = (props) => {
                         <input aria-label="Email Box"
                                value={email}
                                onChange={e => updateEmail(e.target.value)}
-                               className="form-control" data-testid="inputEmail"
+                               className="form-control" data-testid="inputEmail" id='inputEmail'
                                placeholder="Enter Email Here"></input>
                     </div>
 
@@ -99,7 +100,7 @@ const Login = (props) => {
                         <input aria-label="Password Box" type="password"
                                value={password}
                                onChange={e => updatePassword(e.target.value)}
-                               className="form-control" data-testid="inputPassword"
+                               className="form-control" data-testid="inputPassword" id='inputPassword'
                                placeholder="Enter Password Here"></input>
                     </div>
 
@@ -111,12 +112,14 @@ const Login = (props) => {
                     <div className="d-flex justify-content-around align-items-center">
                         <button type="button"
                                 className="btn btn-lg btn-outline-dark"
+                                id='registerRedirect'
                                 onClick={register}>
                             Register
                         </button>
                         <button type="submit"
                                 disabled={buttonDisabled}
                                 className="btn btn-lg btn-primary"
+                                id='loginButton'
                                 data-testid="loginButton">
                             {buttonDisabled ? 'Logging In...' : 'Log In'}
                         </button>
@@ -127,6 +130,7 @@ const Login = (props) => {
                 <div className="d-flex w-100 m-2 justify-content-around align-items-center">
                     <button type="button"
                             className="btn"
+                            id='backButton'
                             onClick={back}>
                         Back
                     </button>

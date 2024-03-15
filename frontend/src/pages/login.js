@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import {useMutation} from "@tanstack/react-query";
 import './pages.css';
 import {useUser} from "../components/UserContext";
+import {Button, Form} from "react-bootstrap";
 
 const Login = (props) => {
     const [loginMessage, setLoginMessage] = useState('')
@@ -23,7 +24,6 @@ const Login = (props) => {
     }
 
     const navigate = useNavigate();
-    const user = useUser();
 
     const LoginMutation = useMutation({
         mutationFn: () => {
@@ -42,7 +42,7 @@ const Login = (props) => {
     }
 
     const [buttonDisabled, setButtonDisabled] = useState(false);
-
+    const user = useUser();
     const onLogin = async (e) => {
         e.preventDefault();
         setButtonDisabled(true);
@@ -51,7 +51,7 @@ const Login = (props) => {
         const result = await LoginMutation.mutateAsync(undefined, undefined);
         const response = await result.json();
         if (!result.ok) {
-            console.log("Login Form Mutation Failed");
+            console.error("Login Form Mutation Failed");
             if (result.status === 500) {
                 setServerError(`An error occurred sending your request: ${LoginMutation.error}`);
             } else if (result.status === 400) {
@@ -60,7 +60,6 @@ const Login = (props) => {
         } else {
             console.log("Login Form Mutation Succeeded");
             if (result.status === 200) {
-                console.log(result.message);
                 console.log(response);
                 await user.refetch();
                 navigate('/');
@@ -69,11 +68,15 @@ const Login = (props) => {
         setButtonDisabled(false);
     }
 
-
-
     const back = () => {
         navigate('/');
     }
+
+    useEffect(() => {
+        if (user.data !== null) {
+            navigate('/');
+        }
+    }, [user.data]);
 
     return (
         <div className="d-flex flex-row gap-2 vh-100 justify-content-center align-items-center">
@@ -85,55 +88,55 @@ const Login = (props) => {
                     Log In
                 </header>
 
-                <form onSubmit={onLogin}>
-                    <div className="mb-3">
-                        <label htmlFor="inputEmail" className="form-label">Email</label>
-                        <input aria-label="Email Box"
-                               value={email}
-                               onChange={e => updateEmail(e.target.value)}
-                               className="form-control" data-testid="inputEmail" id='inputEmail'
-                               placeholder="Enter Email Here"></input>
-                    </div>
-
-                    <div className="mb-3">
-                        <label htmlFor="inputPassword" className="form-label">Password</label>
-                        <input aria-label="Password Box" type="password"
-                               value={password}
-                               onChange={e => updatePassword(e.target.value)}
-                               className="form-control" data-testid="inputPassword" id='inputPassword'
-                               placeholder="Enter Password Here"></input>
-                    </div>
-
+                <Form onSubmit={onLogin}>
+                    <Form.Group className='mb-3'>
+                        <Form.Label htmlFor='inputEmail'>Email</Form.Label>
+                        <Form.Control aria-label="Email Box"
+                                      value={email}
+                                      onChange={e => updateEmail(e.target.value)}
+                                      data-testid="inputEmail" id='inputEmail'
+                                      placeholder="Enter Email Here" />
+                    </Form.Group>
+                    <Form.Group className='mb-3'>
+                        <Form.Label htmlFor='inputPassword'>Password</Form.Label>
+                        <Form.Control aria-label="Email Box"
+                                      type='password'
+                                      value={password}
+                                      onChange={e => updatePassword(e.target.value)}
+                                      data-testid="inputPassword" id='inputPassword'
+                                      placeholder="Enter Password Here" />
+                    </Form.Group>
                     <div>
                         {loginMessage === '' ? <div></div> : <label>{loginMessage}</label>}
                         {serverError === '' ? <div></div> : <label className='text-danger'>{serverError}</label>}
                     </div>
-
                     <div className="d-flex justify-content-around align-items-center">
-                        <button type="button"
+                        <Button type="button"
+                                size='lg'
+                                variant='outline-dark'
                                 className="btn btn-lg btn-outline-dark"
                                 id='registerRedirect'
                                 onClick={register}>
                             Register
-                        </button>
-                        <button type="submit"
+                        </Button>
+                        <Button type="submit"
                                 disabled={buttonDisabled}
-                                className="btn btn-lg btn-primary"
+                                size='lg'
+                                variant='primary'
                                 id='loginButton'
                                 data-testid="loginButton">
                             {buttonDisabled ? 'Logging In...' : 'Log In'}
-                        </button>
+                        </Button>
                     </div>
-                </form>
-
+                </Form>
 
                 <div className="d-flex w-100 m-2 justify-content-around align-items-center">
-                    <button type="button"
-                            className="btn"
+                    <Button type="button"
+                            variant='outline-secondary'
                             id='backButton'
                             onClick={back}>
                         Back
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

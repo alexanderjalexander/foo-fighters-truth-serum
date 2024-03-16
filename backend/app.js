@@ -21,19 +21,6 @@ app.use(
   })
 );
 
-
-
-
-//prevent login if session active. not needed for /registration
-app.use("/login", (req, res, next) => {
-  if (req.session.user) {
-    return res.redirect("/");
-  } else {
-    req.method = "POST";
-    next();
-  }
-});
-
 configRoutes(app);
 
 // All client pages

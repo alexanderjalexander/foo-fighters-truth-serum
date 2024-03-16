@@ -5,18 +5,26 @@ import { createPerson } from "../data/people.js";
 const router = Router()
 
 router.post("/", async (req, res) => {
-  if(!req.session){
+  if (!req.session) {
     res.status(400).json({ error: "No active session detected" });
   }
-  const { personName } = req.body;
-  let userId =  req.session.userId;
-  try {
-    await createPerson(userId, personName).then((person) => {
-      res.status(200).json({ message: `Succesfully added person ${person.name}`});
+
+  const personName = req.body.personName;
+  const userId = req.session.userId;
+
+  await createPerson(userId, personName)
+    .then((person) => {
+      res.status(201).json({ message: `Successfully added person ${person.name}` });
+    })
+    .catch((err) => {
+      if (err.message == "User does not exist.") {
+        res.status(500);
+      } else if (err.message == "A person with that name exists already.") {
+        res.status(400).json({ error: err.message });
+      } else {
+        res.status(500).json({ error: 'Failed to add person to user.' });
+      }
     });
-    } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
+  });
 
 export default router;

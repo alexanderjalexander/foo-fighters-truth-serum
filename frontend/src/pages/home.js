@@ -36,10 +36,17 @@ const Home = (props) => {
 
     const logout = async () => {
         const result = await LogoutMutation.mutateAsync(undefined, undefined);
+        const response = await result.json();
         if (!result.ok) {
-            console.log('Logout Form Mutation Failed');
+            console.error('Logout Form Mutation Failed');
+            if (result.status === 500) {
+                console.error('A server error occurred')
+            } else if (result.status === 401) {
+                console.error(response.error);
+            }
         } else {
             console.log('Logout Form Mutation Succeeded');
+            console.log(response.message);
             user.refetch();
         }
     }

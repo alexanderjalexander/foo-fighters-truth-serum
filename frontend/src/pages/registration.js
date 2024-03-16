@@ -65,7 +65,7 @@ const Register = (props) => {
             }
         } else {
             console.log("Registration Form Mutation Succeeded");
-            if (result.status === 200) {
+            if (result.status === 201) {
                 console.log(result.message);
                 login();
             }

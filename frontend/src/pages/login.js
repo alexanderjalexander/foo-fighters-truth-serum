@@ -52,10 +52,8 @@ const Login = (props) => {
         const response = await result.json();
         if (!result.ok) {
             console.error("Login Form Mutation Failed");
-            if (result.status === 500) {
-                setServerError(`An error occurred sending your request: ${LoginMutation.error}`);
-            } else if (result.status === 400) {
-                setServerError(`Registration Error: ${response.message}`)
+            if (result.status === 400) {
+                setServerError(`Login Error: ${response.message}`)
             }
         } else {
             console.log("Login Form Mutation Succeeded");

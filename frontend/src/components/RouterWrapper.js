@@ -37,7 +37,8 @@ export default function RouterWrapper() {
         },
         {
             path: '/:name/:id',
-            element: <Person />
+            element: <Person />,
+            errorElement: <ErrorBoundary />
         }
     ])
 

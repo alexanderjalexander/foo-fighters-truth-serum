@@ -10,6 +10,7 @@ export function useUser() {
 export const AuthWrapper = ({children}) => {
     // await stuff here and then hopefully get stuff back?????
     const {isPending,
+        isError,
         error,
         refetch,
         data} = useQuery({
@@ -37,13 +38,12 @@ export const AuthWrapper = ({children}) => {
             </div>
         )
     }
-
-    if (error) {
+    else if (isError) {
         return (
             <div className="d-flex vh-100 text-center justify-content-center align-items-center">
                 <div>
                     <header className="fs-1">Error</header>
-                    <p>{error}</p>
+                    <p>{error.toString()}</p>
                 </div>
             </div>
         )

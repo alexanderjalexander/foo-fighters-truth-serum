@@ -2,6 +2,8 @@ import React, {useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import {useUser} from "../components/UserContext";
 import {useMutation} from "@tanstack/react-query";
+import Dashboard from "./dashboard";
+import {Button} from "react-bootstrap";
 
 const Home = (props) => {
     let user = useUser();
@@ -49,14 +51,7 @@ const Home = (props) => {
     if (loggedIn) {
         return (
             <div>
-                <div className="p-2 d-flex flex-row border border-top-0 border-start-0 border-end-0 border-3 justify-content-between">
-                    <header id='dashboardHeader' className="fs-3">Dashboard</header>
-                    <input type="button"
-                           className="btn btn-primary"
-                           onClick={ loginHandler }
-                           value="Log Out"
-                    />
-                </div>
+                <Dashboard loginHandler={loginHandler}/>
             </div>
         )
     } else {
@@ -64,18 +59,20 @@ const Home = (props) => {
             <div className="d-flex vh-100 text-center justify-content-center align-items-center">
                 <div>
                     <header id='home-title' className="fs-1">Truth Serum EEG</header>
-                    <input id='homeLoginButton'
-                           type="button"
-                           className="btn btn-lg btn-primary m-2 sd-inline"
-                           onClick={ loginHandler }
-                           value="Log In"
-                    />
-                    <input id='homeRegisterButton'
-                           type="button"
-                           className="btn btn-lg btn-primary m-2 d-inline"
-                           onClick={ register }
-                           value="Register"
-                    />
+                    <Button id='homeLoginButton'
+                            variant='primary'
+                            size='lg'
+                            className='m-2 d-inline'
+                            onClick={loginHandler}>
+                        Log In
+                    </Button>
+                    <Button id='homeRegisterButton'
+                            variant='primary'
+                            size='lg'
+                            className='m-2 d-inline'
+                            onClick={register}>
+                        Register
+                    </Button>
                 </div>
             </div>
         )

@@ -4,6 +4,7 @@ import Login from "./pages/login"
 import Registration from "./pages/registration"
 import {AuthWrapper} from "./components/UserContext";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import RouterWrapper from "./components/RouterWrapper";
 
 function App() {
     const queryClient = new QueryClient();
@@ -11,17 +12,7 @@ function App() {
     return (
         <QueryClientProvider client={queryClient}>
             <AuthWrapper>
-                <BrowserRouter>
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/login"
-                               element={<Login />}
-                        />
-                        <Route path="/register"
-                               element={<Registration />}
-                        />
-                    </Routes>
-                </BrowserRouter>
+                <RouterWrapper />
             </AuthWrapper>
         </QueryClientProvider>
     );

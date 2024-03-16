@@ -9,8 +9,8 @@ const Person = () => {
     const params = useParams();
     const name = params.name;
     const id = params.id;
-    console.log(name);
-    console.log(id);
+    // console.log(name);
+    // console.log(id);
     const {isPending,
         isError,
         error,

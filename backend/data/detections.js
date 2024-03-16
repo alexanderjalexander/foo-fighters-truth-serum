@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
-import { detections, users } from "../config/mongo";
-import { requireData, requireId, requireString, stringifyId } from "../validation";
-import { getPersonById } from "./people";
+import { detections, users } from "../config/mongo.js";
+import { requireData, requireId, requireString, stringifyId } from "../validation.js";
+import { getPersonById } from "./people.js";
 
 /**
  * @typedef Detection

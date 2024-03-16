@@ -13,23 +13,16 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   session({
-    name: "goodName",
+    name: "sessionCookie",
     secret: "NJTransitFareHikeComingJuly",
-    saveUninitialized: false,
+    saveUninitialized: false, //set to true to create a session for testing
     resave: false,
-    cookie: { maxAge: 1000 * 60 },
+    cookie: { maxAge: 1000 * 60 * 10 }, //10 minutes
   })
 );
 
-//prevent from advancing to logged-in utility when not in session.
-app.use("/private", (req, res, next) => {
-  console.log(req.session.id);
-  if (!req.session.user) {
-    return res.redirect("/");
-  } else {
-    next();
-  }
-});
+
+
 
 //prevent login if session active. not needed for /registration
 app.use("/login", (req, res, next) => {
@@ -56,6 +49,7 @@ const server = await new Promise(resolve => {
   });
 });
 
+
 const closeServer = async () => {
   await new Promise((resolve, reject) => server.close((err) => {
     err ? reject(err) : resolve();
@@ -63,4 +57,4 @@ const closeServer = async () => {
   await closeConnection();
 };
 
-export { closeServer };
+export { closeServer};

@@ -31,4 +31,4 @@ Backend tests can be run by running `npm test` in the `backend` directory.
 ### Frontend
 Frontend tests can be run by running `npm test` in the `frontend` directory.
 
-Before running the frontend tests, ensure that the backend is started and running by running `npm start` in the `backend` directory. 
+Before running the frontend tests, ensure that both the frontend and the backend are started and running by running `npm start` in both the `frontend` and `backend` directories. 

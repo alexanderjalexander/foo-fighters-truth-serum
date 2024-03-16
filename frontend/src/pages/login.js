@@ -1,8 +1,8 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {useNavigate} from "react-router-dom";
-import {UserContext} from "../components/UserContext";
 import {useMutation} from "@tanstack/react-query";
 import './pages.css';
+import {useUser} from "../components/UserContext";
 
 const Login = (props) => {
     const [loginMessage, setLoginMessage] = useState('')
@@ -22,12 +22,10 @@ const Login = (props) => {
         setServerError('');
     }
 
-
     const navigate = useNavigate();
+    const user = useUser();
 
-    const {user, setUser} = useContext(UserContext);
-
-    const FormMutation = useMutation({
+    const LoginMutation = useMutation({
         mutationFn: () => {
             return fetch('/api/login', {
                 method: 'POST',
@@ -39,16 +37,23 @@ const Login = (props) => {
         }
     })
 
-    const onLogin = async () => {
-        // Will contain routing implementations to log in
+    const register = () => {
+        navigate('/register');
+    }
+
+    const [buttonDisabled, setButtonDisabled] = useState(false);
+
+    const onLogin = async (e) => {
+        e.preventDefault();
+        setButtonDisabled(true);
         setLoginMessage('');
         setServerError('');
-        const result = await FormMutation.mutateAsync(undefined, undefined);
+        const result = await LoginMutation.mutateAsync(undefined, undefined);
         const response = await result.json();
         if (!result.ok) {
             console.log("Login Form Mutation Failed");
             if (result.status === 500) {
-                setServerError(`An error occurred sending your request: ${FormMutation.error}`);
+                setServerError(`An error occurred sending your request: ${LoginMutation.error}`);
             } else if (result.status === 400) {
                 setServerError(`Registration Error: ${response.message}`)
             }
@@ -56,15 +61,15 @@ const Login = (props) => {
             console.log("Login Form Mutation Succeeded");
             if (result.status === 200) {
                 console.log(result.message);
-                setUser(true);
+                console.log(response);
+                await user.refetch();
                 navigate('/');
             }
         }
+        setButtonDisabled(false);
     }
 
-    const register = () => {
-        navigate('/register');
-    }
+
 
     const back = () => {
         navigate('/');
@@ -75,51 +80,57 @@ const Login = (props) => {
             <title>Log In</title>
             <div className="container-sm-only">
                 <header data-testid="loginHeader"
-                    className="fs-1 text-center">
+                        id='loginHeader'
+                        className="fs-1 text-center">
                     Log In
                 </header>
 
-                <div className="mb-3">
-                    <label htmlFor="inputEmail" className="form-label">Email</label>
-                    <input aria-label="Email Box"
-                           value={email}
-                           onChange={e => updateEmail(e.target.value)}
-                           className="form-control" data-testid="inputEmail"
-                           placeholder="Enter Email Here"></input>
-                </div>
+                <form onSubmit={onLogin}>
+                    <div className="mb-3">
+                        <label htmlFor="inputEmail" className="form-label">Email</label>
+                        <input aria-label="Email Box"
+                               value={email}
+                               onChange={e => updateEmail(e.target.value)}
+                               className="form-control" data-testid="inputEmail" id='inputEmail'
+                               placeholder="Enter Email Here"></input>
+                    </div>
 
-                <div className="mb-3">
-                    <label htmlFor="inputPassword" className="form-label">Password</label>
-                    <input aria-label="Password Box" type="password"
-                           value={password}
-                           onChange={e => updatePassword(e.target.value)}
-                           className="form-control" data-testid="inputPassword"
-                           placeholder="Enter Password Here"></input>
-                </div>
+                    <div className="mb-3">
+                        <label htmlFor="inputPassword" className="form-label">Password</label>
+                        <input aria-label="Password Box" type="password"
+                               value={password}
+                               onChange={e => updatePassword(e.target.value)}
+                               className="form-control" data-testid="inputPassword" id='inputPassword'
+                               placeholder="Enter Password Here"></input>
+                    </div>
 
-                <div>
-                    {loginMessage === '' ? <div></div> : <label>{loginMessage}</label>}
-                    {serverError === '' ? <div></div> : <label className='text-danger'>{serverError}</label>}
-                </div>
+                    <div>
+                        {loginMessage === '' ? <div></div> : <label>{loginMessage}</label>}
+                        {serverError === '' ? <div></div> : <label className='text-danger'>{serverError}</label>}
+                    </div>
 
-                <div className="d-flex justify-content-around align-items-center">
-                    <button type="button"
-                            className="btn btn-lg btn-outline-dark"
-                            onClick={register}>
-                        Register
-                    </button>
-                    <button type="button"
-                            className="btn btn-lg btn-primary"
-                            data-testid="loginButton"
-                            onClick={onLogin}>
-                        Login
-                    </button>
-                </div>
+                    <div className="d-flex justify-content-around align-items-center">
+                        <button type="button"
+                                className="btn btn-lg btn-outline-dark"
+                                id='registerRedirect'
+                                onClick={register}>
+                            Register
+                        </button>
+                        <button type="submit"
+                                disabled={buttonDisabled}
+                                className="btn btn-lg btn-primary"
+                                id='loginButton'
+                                data-testid="loginButton">
+                            {buttonDisabled ? 'Logging In...' : 'Log In'}
+                        </button>
+                    </div>
+                </form>
 
 
                 <div className="d-flex w-100 m-2 justify-content-around align-items-center">
                     <button type="button"
                             className="btn"
+                            id='backButton'
                             onClick={back}>
                         Back
                     </button>

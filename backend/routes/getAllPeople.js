@@ -32,8 +32,8 @@ router.get("/", async (req, res) => {
       await getUserById(req.session.userId).then((user) => {
         const people = user.people;
         let peopleRes = [];
-        people.forEach((person) => { //omitting detections. not sending any mongoIDs either
-          peopleRes.push({name: person.name, numDetections: person.detections.length});
+        people.forEach((person) => { //omitting detections.
+          peopleRes.push({id: person._id, name: person.name, numDetections: person.detections.length});
         });
       res.status(200).json({ peopleRes });
     });

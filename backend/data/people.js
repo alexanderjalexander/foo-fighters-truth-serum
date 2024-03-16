@@ -49,7 +49,8 @@ export const getPersonByName = async (userId, personName) => {
  * @returns {Promise<Person?>} The Person, or null if they couldn't be found.
  */
 export const getPersonById = async (userId, personId) => {
-  userId = requireId(userId);
+  userId = requireId(userId, "User id");
+  personId = requireId(personId, "Person id")
 
   if (!(await getUserById(userId)))
     throw new Error('User does not exist.');

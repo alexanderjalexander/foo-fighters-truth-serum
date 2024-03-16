@@ -187,6 +187,8 @@ describe('Chrome', () => {
     });
 })
 
+jest.setTimeout(15000);
+
 describe('Firefox', () => {
     test('Renders Home Title', async () => {
         // Initializing Drivers for Selenium

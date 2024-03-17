@@ -36,7 +36,15 @@ router.get("/:personId", async (req, res) => {
     }
     // console.log(req.session.userId);
     // console.log(req.params.personId)
-    const person = await getPersonById(req.session.userId, personId);
+    let person = null;
+    try {
+      person = await getPersonById(req.session.userId, personId);
+    } catch (error) {
+      if (error.message == "User does not exist.") {
+        res.status(404).json({ error: "request made with nonexistent personId" });
+      }
+    }
+    
     //gets user does not exist thrown when i switch ids, which indicates that it is checking the user id properly
     console.log(person);
     if (!person) {

@@ -69,7 +69,7 @@ const Dashboard = ({loginHandler}) => {
                     {data.peopleRes.map((person) => (
                         <ListGroup.Item id={`${person.name}`}
                                         className='text-start'
-                                        href={`/${person.name}/${person.id}`}
+                                        href={`/${person.id}`}
                                         key={person.name}
                                         action>
                             {person.name}
@@ -126,7 +126,6 @@ const Dashboard = ({loginHandler}) => {
         }
     };
 
-    // TODO: Component Separation
     return (
         <div>
             <Modal show={modalShow} onHide={HideModal} backdrop="static">

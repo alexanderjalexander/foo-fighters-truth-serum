@@ -7,16 +7,28 @@ import {Button, Form, ListGroup, Modal, Spinner} from "react-bootstrap";
 const Person = () => {
     // Obtain the data on the user, however possible.
     const params = useParams();
-    const name = params.name;
     const id = params.id;
 
     // Handling Responses
     let response;
-    const {isPending,
-        isError,
-        error,
-        refetch,
-        data} = useQuery({
+
+    // Obtaining People Query
+    const peopleQuery = useQuery({
+        queryKey: ['getAllPeople'],
+        queryFn: async () => {
+            const result = await fetch('/api/getAllPeople', {
+                method: 'GET',
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            })
+            if (!result.ok) {
+                return null;
+            }
+            return await result.json();
+        }
+    });
+    const detectionsQuery = useQuery({
         queryKey: ['getAllDetections'],
         queryFn: async () => {
             response = await fetch(`/api/getAllDetections/${id}`, {
@@ -25,17 +37,44 @@ const Person = () => {
                     "Content-Type": "application/json",
                 },
             })
+            console.log(response.status);
             if (!response.ok) {
-
+                return null;
             } else {
                 return await response.json();
             }
         }
     });
 
-    // Handling Detection Displaying
+    // Person Name Displaying
+    let people = peopleQuery.data;
+    let person;
+    let personName = (
+        <Spinner animation='border' role="status">
+            <span className="visually-hidden">Loading...</span>
+        </Spinner>
+    );
+    const updatePersonName = () => {
+        if (peopleQuery.isPending) {
+            personName = (
+                <Spinner animation='border' role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </Spinner>
+            )
+        } else if (peopleQuery.isError) {
+            personName = 'Error';
+        } else if (people !== undefined) {
+            person = (people.peopleRes.find((person) => {
+                return person.id === id;
+            }));
+            personName = person.name;
+        }
+    }
+
     let detections;
-    if (isPending) {
+
+    // Detections Section Handling
+    if (detectionsQuery.isPending) {
         detections = (
             <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
                 <Spinner animation='border' role="status">
@@ -43,37 +82,41 @@ const Person = () => {
                 </Spinner>
             </div>
         );
-    } else if (isError) {
+    } else if (detectionsQuery.isError) {
+        personName = 'Error';
         detections = (
             <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
                 <div>
                     <header className="fs-1">Error</header>
-                    <p>{error.toString()}</p>
+                    <p>{detectionsQuery.error.toString()}</p>
                 </div>
             </div>
         );
-    } else if (data === null) {
+    } else if (detectionsQuery.data === null) {
+        personName = 'Error';
         detections = (
             <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
                 <div>
                     <header className="fs-1">Error</header>
-                    <p>An error occurred while fetching detections(data was null). Try logging out and back in.</p>
+                    <p>An error occurred while fetching detections(data was null).</p>
+                    <p>Ensure you are visiting the correct person, or log out and in again.</p>
                 </div>
             </div>
         );
-    } else if (data.length === 0) {
+    } else if (detectionsQuery.data.length === 0) {
+        updatePersonName();
         detections = (
             <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
                 <p>No detections yet! Add a detection session with the 'Add' button at the top.</p>
             </div>
         );
     } else {
+        updatePersonName();
         detections = (
             <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
                 <ListGroup>
-                    {data.map((detection) => (
+                    {detectionsQuery.data.map((detection) => (
                         <ListGroup.Item className='text-start'
-                                        href={`/${detection.name}`}
                                         key={detection.name}
                                         action>
                             {detection.name}
@@ -85,19 +128,7 @@ const Person = () => {
         );
     }
 
-    // Handle user not being logged in, redirect as needed
-    const user = useUser();
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (user.data === null) {
-            navigate('/');
-        }
-    }, [user.data]);
 
-    // Handle going back to the main screen.
-    const back = () => {
-        navigate('/');
-    };
 
     // Add Detection Form Mutation
 
@@ -118,13 +149,26 @@ const Person = () => {
         e.preventDefault();
         setAddDisabled(true);
 
-        await refetch();
+        await detectionsQuery.refetch();
         HideModal();
         setDetectionName('');
         setAddDisabled(false);
     }
 
-    // TODO: Component Separation
+    // Handle going back to the main screen.
+    const navigate = useNavigate();
+    const back = () => {
+        navigate('/');
+    };
+
+    // Handle not logged in case
+    const user = useUser();
+    useEffect(() => {
+        if (user.data === null) {
+            navigate('/');
+        }
+    }, [user.data]);
+
     return (
         <div>
             <Modal show={modalShow} onHide={HideModal} backdrop="static">
@@ -161,7 +205,7 @@ const Person = () => {
                 </Form>
             </Modal>
             <div className="p-2 d-flex flex-row border border-top-0 border-start-0 border-end-0 border-3 justify-content-between">
-                <header id='dashboardHeader' className="fs-3">{name}</header>
+                <header id='dashboardHeader' className="fs-3">{personName}</header>
                 <div className='d-flex flex-row'>
                     <Button className='mx-1'
                             variant='secondary'

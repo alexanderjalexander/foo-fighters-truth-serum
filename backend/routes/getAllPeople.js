@@ -9,14 +9,17 @@ expect json with the format of:
 {
     "peopleRes": [
         {
+            "id": ObjectId(...),
             "name": "Richard",
             "numDetections": 2
         },
         {
+            "id": ObjectId(...),
             "name": "Ronald",
             "numDetections": 1
         },
         {
+            "id": ObjectId(...),
             "name": "Kevin",
             "numDetections": 0
         }

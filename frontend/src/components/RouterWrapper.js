@@ -36,7 +36,7 @@ export default function RouterWrapper() {
             element: <Register />
         },
         {
-            path: '/:name/:id',
+            path: '/:id',
             element: <Person />,
             errorElement: <ErrorBoundary />
         }

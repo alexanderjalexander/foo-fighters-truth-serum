@@ -59,9 +59,6 @@ router.get("/:personId", async (req, res) => {
         return;
       }
     });
-    detectionArr.forEach((detection) => {
-      delete detection._id;
-    });
     res.status(200).json(detectionArr);
 });
 

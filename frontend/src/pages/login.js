@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
-import {useMutation} from "@tanstack/react-query";
 import './pages.css';
 import {useUser} from "../components/UserContext";
 import {Button, Form} from "react-bootstrap";
+import {useLoginMutation} from "../query/auth";
 
-const Login = (props) => {
+const Login = () => {
     const [loginMessage, setLoginMessage] = useState('')
     const [serverError, setServerError] = useState('')
 
@@ -25,17 +25,7 @@ const Login = (props) => {
 
     const navigate = useNavigate();
 
-    const LoginMutation = useMutation({
-        mutationFn: () => {
-            return fetch('/api/login', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({email, password})
-            })
-        }
-    })
+    const LoginMutation = useLoginMutation(email, password);
 
     const register = () => {
         navigate('/register');
@@ -48,20 +38,14 @@ const Login = (props) => {
         setButtonDisabled(true);
         setLoginMessage('');
         setServerError('');
-        const result = await LoginMutation.mutateAsync(undefined, undefined);
-        const response = await result.json();
-        if (!result.ok) {
-            console.error("Login Form Mutation Failed");
-            if (result.status === 400) {
-                setServerError(`Login Error: ${response.message}`)
-            }
-        } else {
+        try {
+            await LoginMutation.mutateAsync(undefined, undefined);
             console.log("Login Form Mutation Succeeded");
-            if (result.status === 200) {
-                console.log(response);
-                await user.refetch();
-                navigate('/');
-            }
+            await user.refetch();
+            navigate('/');
+        } catch(e) {
+            console.error("Login Form Mutation Failed");
+            setServerError(e.status + ':' + e.message)
         }
         setButtonDisabled(false);
     }
@@ -74,7 +58,7 @@ const Login = (props) => {
         if (user.data !== null) {
             navigate('/');
         }
-    }, [user.data]);
+    }, [user.data, navigate]);
 
     return (
         <div className="d-flex flex-row gap-2 vh-100 justify-content-center align-items-center">

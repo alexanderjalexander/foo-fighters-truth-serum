@@ -1,49 +1,18 @@
 import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-import {useMutation, useQuery} from "@tanstack/react-query";
+import {useMutation} from "@tanstack/react-query";
 import {useUser} from "../components/UserContext";
 import {Button, Form, ListGroup, Modal, Spinner} from "react-bootstrap";
+import {useLogoutMutation} from "../query/auth";
+import {useGetAllDetectionsQuery, useGetAllPeopleQuery} from "../query/people";
 
 const Person = () => {
     // Obtain the data on the user, however possible.
     const params = useParams();
     const id = params.id;
 
-    // Handling Responses
-    let response;
-
-    // Obtaining People Query
-    const peopleQuery = useQuery({
-        queryKey: ['getAllPeople'],
-        queryFn: async () => {
-            const result = await fetch('/api/getAllPeople', {
-                method: 'GET',
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            })
-            if (!result.ok) {
-                return null;
-            }
-            return await result.json();
-        }
-    });
-    const detectionsQuery = useQuery({
-        queryKey: ['getAllDetections'],
-        queryFn: async () => {
-            response = await fetch(`/api/getAllDetections/${id}`, {
-                method: 'GET',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            })
-            if (!response.ok) {
-                return null;
-            } else {
-                return await response.json();
-            }
-        }
-    });
+    const peopleQuery = useGetAllPeopleQuery();
+    const detectionsQuery = useGetAllDetectionsQuery(id);
 
     // Person Name Displaying
     let people = peopleQuery.data;
@@ -63,8 +32,8 @@ const Person = () => {
         } else if (peopleQuery.isError) {
             personName = 'Error';
         } else if (people !== undefined) {
-            person = (people.peopleRes.find((person) => {
-                return person.id === id;
+            person = (people.find((person) => {
+                return person._id === id;
             }));
             personName = person.name;
         }
@@ -75,59 +44,46 @@ const Person = () => {
     // Detections Section Handling
     if (detectionsQuery.isPending) {
         detections = (
-            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
-                <Spinner animation='border' role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </Spinner>
-            </div>
+            <Spinner animation='border' role="status">
+                <span className="visually-hidden">Loading...</span>
+            </Spinner>
         );
     }
     else if (detectionsQuery.isError) {
         personName = 'Error';
         detections = (
-            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
-                <div>
-                    <header className="fs-1">Error</header>
-                    <p>{detectionsQuery.error.toString()}</p>
-                </div>
+            <div>
+                <header className="fs-1">Error</header>
+                <p>{detectionsQuery.error.status}: {detectionsQuery.error.message}</p>
             </div>
         );
-    }
-    else if (detectionsQuery.data === null) {
+    } else if (detectionsQuery.data === null) {
         personName = 'Error';
         detections = (
-            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
-                <div>
-                    <header className="fs-1">Error</header>
-                    <p>An error occurred while fetching detections(data was null).</p>
-                    <p>Ensure you are visiting the correct person, or log out and in again.</p>
-                </div>
+            <div>
+                <header className="fs-1">Error</header>
+                <p>An error occurred while fetching detections(data was null).</p>
+                <p>Ensure you are visiting the correct person, or log out and in again.</p>
             </div>
         );
-    }
-    else if (detectionsQuery.data.length === 0) {
+    } else if (detectionsQuery.data.length === 0) {
         updatePersonName();
         detections = (
-            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
-                <p>No detections yet! Add a detection session with the 'Add' button at the top.</p>
-            </div>
+            <p>No detections yet! Add a detection session with the 'Add' button at the top.</p>
         );
-    }
-    else {
+    } else {
         updatePersonName();
         detections = (
-            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
-                <ListGroup>
-                    {detectionsQuery.data.map((detection) => (
-                        <ListGroup.Item className='text-start'
-                                        key={detection.name}
-                                        action>
-                            {detection.name}
-                            <p className='m-1'>{detection.data}</p>
-                        </ListGroup.Item>
-                    ))}
-                </ListGroup>
-            </div>
+            <ListGroup>
+                {detectionsQuery.data.map((detection) => (
+                    <ListGroup.Item className='text-start'
+                                    key={detection.name}
+                                    action>
+                        {detection.name}
+                        <p className='m-1'>{detection.data}</p>
+                    </ListGroup.Item>
+                ))}
+            </ListGroup>
         );
     }
 
@@ -199,33 +155,18 @@ const Person = () => {
     }, [user.data, navigate]);
 
     // Handling logging out
-    const LogoutMutation = useMutation({
-        mutationFn: () => {
-            return fetch('/api/logout', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            })
-        }
-    })
+    const LogoutMutation = useLogoutMutation();
 
     // Log Out Button Function.
     const logout = async () => {
-        const result = await LogoutMutation.mutateAsync(undefined, undefined);
-        const response = await result.json();
-        if (!result.ok) {
-            console.error('Logout Form Mutation Failed');
-            if (result.status === 500) {
-                console.error('A server error occurred')
-            } else if (result.status === 401) {
-                console.error(response.error);
-            }
-        } else {
+        try {
+            await LogoutMutation.mutateAsync(undefined, undefined);
             console.log('Logout Form Mutation Succeeded');
-            console.log(response.message);
             await user.refetch();
             navigate('/');
+        } catch(e) {
+            console.error('Logout Form Mutation Failed');
+            console.error(e);
         }
     }
 
@@ -299,7 +240,9 @@ const Person = () => {
                     Add
                 </button>
             </div>
-            {detections}
+            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
+                {detections}
+            </div>
         </div>
     )
 }

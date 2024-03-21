@@ -1,18 +1,17 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import {checkEmail, checkPassword} from "../components/validation";
-import {useMutation} from "@tanstack/react-query";
 import './pages.css';
 import {useUser} from "../components/UserContext";
 import {Button, Form} from "react-bootstrap";
+import {useRegistrationMutation} from "../query/auth";
 
-const Register = (props) => {
+const Register = () => {
     const [email, setEmail] = useState('')
     const [emailError, setEmailError] = useState('')
     function updateEmail(em) {
         setEmail(em);
         setEmailError('');
-        setRegisMessage('');
         setServerError('');
     }
 
@@ -21,24 +20,12 @@ const Register = (props) => {
     function updatePassword(ps) {
         setPassword(ps);
         setPasswordError(checkPassword(ps));
-        setRegisMessage('');
         setServerError('');
     }
 
-    const [regisMessage, setRegisMessage] = useState('')
     const [serverError, setServerError] = useState('')
 
-    const FormMutation = useMutation({
-        mutationFn: () => {
-            return fetch('/api/registration', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({email, password})
-            })
-        }
-    })
+    const RegistrationMutation = useRegistrationMutation(email, password);
 
     const navigate = useNavigate();
 
@@ -51,24 +38,14 @@ const Register = (props) => {
     const onRegister = async (e) => {
         e.preventDefault();
         setButtonDisabled(true);
-        setRegisMessage('');
         setServerError('');
-        const result = await FormMutation.mutateAsync(undefined, undefined);
-        const response = await result.json();
-        console.log(result);
-        if (!result.ok) {
-            console.error("Registration Form Mutation Failed");
-            if (result.status === 500) {
-                setServerError(`An error occurred sending your request: ${FormMutation.error}`);
-            } else if (result.status === 400) {
-                setServerError(`Registration Error: ${response.error}`)
-            }
-        } else {
+        try {
+            await RegistrationMutation.mutateAsync(undefined, undefined);
             console.log("Registration Form Mutation Succeeded");
-            if (result.status === 201) {
-                console.log(result.message);
-                login();
-            }
+            login();
+        } catch(e) {
+            console.error("Registration Form Mutation Failed");
+            setServerError(e.status + ':' + e.message)
         }
         setButtonDisabled(false);
     }
@@ -83,7 +60,7 @@ const Register = (props) => {
         if (user.data !== null) {
             navigate('/');
         }
-    }, [user.data]);
+    }, [user.data, navigate]);
 
     return (
         <div className="d-flex flex-row vh-100 justify-content-center align-items-center">
@@ -100,7 +77,7 @@ const Register = (props) => {
                         <Form.Label htmlFor='inputEmail'>Email</Form.Label>
                         <Form.Control aria-label="Email Box"
                                       value={email}
-                                      onBlur={e => setEmailError(checkEmail(email))}
+                                      onBlur={_ => setEmailError(checkEmail(email))}
                                       onChange={e => updateEmail(e.target.value)}
                                       data-testid="inputEmail" id='inputEmail'
                                       placeholder="Enter Email Here" />
@@ -119,7 +96,6 @@ const Register = (props) => {
                     </Form.Group>
 
                     <div>
-                        {regisMessage === '' ? <div></div> : <label>{regisMessage}</label>}
                         {serverError === '' ? <div></div> : <label className='text-danger'>{serverError}</label>}
                     </div>
 

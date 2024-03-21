@@ -154,7 +154,7 @@ const Dashboard = ({loginHandler}) => {
                         <Button type='submit'
                                 variant="primary"
                                 id='addPersonSubmit'
-                                disabled={addDisabled}
+                                disabled={addDisabled || isError || isPending}
                                 onClick={onAddPerson}>
                             {addDisabled ? 'Adding...' : 'Add'}
                         </Button>

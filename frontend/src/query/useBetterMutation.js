@@ -1,6 +1,6 @@
 import {useMutation} from "@tanstack/react-query";
 
-export const useBetterMutation = (...fetchArgs) => {
+export const useBetterMutation = (json, ...fetchArgs) => {
     return useMutation({
         mutationFn: async () => {
             try {
@@ -11,7 +11,8 @@ export const useBetterMutation = (...fetchArgs) => {
                         message: (await res.json()).error
                     }
                 }
-                return await res.json();
+                if (json) { return await res.json(); }
+                else { return res; }
             } catch (e) {
                 if (e instanceof TypeError) {
                     throw { status: 500, message: "Failed to get data, please try again in a moment." };

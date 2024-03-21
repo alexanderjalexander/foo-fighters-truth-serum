@@ -18,7 +18,8 @@ export const useMeQuery = () => useQuery({
 });
 
 export const useLoginMutation = (email, password) => useBetterMutation(
-'/api/login',
+true,
+    '/api/login',
     {
         method: 'POST',
         headers: {
@@ -29,7 +30,8 @@ export const useLoginMutation = (email, password) => useBetterMutation(
 )
 
 export const useRegistrationMutation = (email, password) => useBetterMutation(
-'/api/register',
+    false,
+    '/api/register',
     {
         method: 'POST',
         headers: {
@@ -40,7 +42,8 @@ export const useRegistrationMutation = (email, password) => useBetterMutation(
 )
 
 export const useLogoutMutation = () => useBetterMutation(
-'/api/logout',
+    false,
+    '/api/logout',
     {
         method: 'POST',
         headers: {

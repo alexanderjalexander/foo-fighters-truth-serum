@@ -14,6 +14,7 @@ export const useGetAllPeopleQuery = () => useBetterQuery(
 )
 
 export const useAddPersonMutation = (name) => useBetterMutation(
+    true,
     '/api/people',
     {
         method: 'POST',

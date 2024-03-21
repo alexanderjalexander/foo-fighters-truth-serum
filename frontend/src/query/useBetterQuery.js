@@ -23,6 +23,7 @@ export const useBetterQuery = (key, json, ...fetchArgs) => {
                 }
                 throw e;
             }
-        }
+        },
+        retry: false
     })
 };

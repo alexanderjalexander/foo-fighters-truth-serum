@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-import {useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import {useUser} from "../components/UserContext";
 import {Button, Form, ListGroup, Modal, Spinner} from "react-bootstrap";
 
@@ -37,7 +37,6 @@ const Person = () => {
                     "Content-Type": "application/json",
                 },
             })
-            console.log(response.status);
             if (!response.ok) {
                 return null;
             } else {
@@ -82,7 +81,8 @@ const Person = () => {
                 </Spinner>
             </div>
         );
-    } else if (detectionsQuery.isError) {
+    }
+    else if (detectionsQuery.isError) {
         personName = 'Error';
         detections = (
             <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
@@ -92,7 +92,8 @@ const Person = () => {
                 </div>
             </div>
         );
-    } else if (detectionsQuery.data === null) {
+    }
+    else if (detectionsQuery.data === null) {
         personName = 'Error';
         detections = (
             <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
@@ -103,14 +104,16 @@ const Person = () => {
                 </div>
             </div>
         );
-    } else if (detectionsQuery.data.length === 0) {
+    }
+    else if (detectionsQuery.data.length === 0) {
         updatePersonName();
         detections = (
             <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
                 <p>No detections yet! Add a detection session with the 'Add' button at the top.</p>
             </div>
         );
-    } else {
+    }
+    else {
         updatePersonName();
         detections = (
             <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
@@ -128,31 +131,57 @@ const Person = () => {
         );
     }
 
-
-
-    // Add Detection Form Mutation
-
-
     // Modal Handling for Adding Detections
     const [modalShow, setModalShow] = useState(false);
     const ShowModal = () => setModalShow(true);
     const HideModal = () => setModalShow(false);
-    const [detectionName, setDetectionName] = useState('');
-    const [addDisabled, setAddDisabled] = useState(false);
-    const [addError, setAddError] = useState('');
-    const updateDetectionName = (newName) => {
-        setDetectionName(newName);
+    const [detectionNameField, setDetectionNameField] = useState('');
+    const updateDetectionNameField = (newName) => {
+        setDetectionNameField(newName);
         setAddError('');
     }
 
-    const onAddSession = async (e) => {
+    const [detectionsFile, setDetectionsFile] = useState(null);
+
+    const [addDisabled, setAddDisabled] = useState(false);
+    const [addError, setAddError] = useState('');
+
+    // Add Detection Form Mutation
+    const AddDetectionMutation = useMutation({
+        mutationFn: () => {
+            return fetch(`/api/people/${id}/detections`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    personId: id,
+                    file: detectionsFile,
+                }),
+            })
+        }
+    })
+
+    // Detection Addition Logic
+    const onAddDetection = async (e) => {
         e.preventDefault();
         setAddDisabled(true);
 
-        await detectionsQuery.refetch();
-        HideModal();
-        setDetectionName('');
-        setAddDisabled(false);
+        const result = await AddDetectionMutation.mutateAsync(undefined, undefined);
+        const response = await result.json();
+        if (!result.ok) {
+            console.error('Add Person Form Mutation Failed');
+            console.error(response.status);
+            console.error(response.error);
+            setAddError(response.status + ':' + response.error);
+            setAddDisabled(false);
+        } else {
+            await detectionsQuery.refetch();
+            HideModal();
+            setDetectionNameField('');
+            setDetectionsFile(null);
+            setAddDisabled(false);
+        }
     }
 
     // Handle going back to the main screen.
@@ -167,12 +196,43 @@ const Person = () => {
         if (user.data === null) {
             navigate('/');
         }
-    }, [user.data]);
+    }, [user.data, navigate]);
+
+    // Handling logging out
+    const LogoutMutation = useMutation({
+        mutationFn: () => {
+            return fetch('/api/logout', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            })
+        }
+    })
+
+    // Log Out Button Function.
+    const logout = async () => {
+        const result = await LogoutMutation.mutateAsync(undefined, undefined);
+        const response = await result.json();
+        if (!result.ok) {
+            console.error('Logout Form Mutation Failed');
+            if (result.status === 500) {
+                console.error('A server error occurred')
+            } else if (result.status === 401) {
+                console.error(response.error);
+            }
+        } else {
+            console.log('Logout Form Mutation Succeeded');
+            console.log(response.message);
+            await user.refetch();
+            navigate('/');
+        }
+    }
 
     return (
         <div>
             <Modal show={modalShow} onHide={HideModal} backdrop="static">
-                <Form onSubmit={onAddSession}>
+                <Form onSubmit={onAddDetection}>
                     <Modal.Header closeButton>
                         <Modal.Title>Add New Detection</Modal.Title>
                     </Modal.Header>
@@ -181,10 +241,21 @@ const Person = () => {
                             <Form.Label>Detection Name</Form.Label>
                             <Form.Control aria-label='Detection Name Box'
                                           id='inputDetectionName'
-                                          value={detectionName}
-                                          onChange={e => updateDetectionName(e.target.value)}
+                                          value={detectionNameField}
+                                          onChange={e => updateDetectionNameField(e.target.value)}
                                           placeholder='Enter Detection Name Here'
                             />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Detection File</Form.Label>
+                            <Form.Control type="file"
+                                          aria-label='Detection File Upload'
+                                          id='inputDetectionFile'
+                                          accept=".csv"
+                                          onChange={(e) => {
+                                              setDetectionsFile(e.target.files[0])
+                                          }}
+                                          placeholder='Place Detections .csv Here' />
                         </Form.Group>
                         <div>
                             {addError === '' ? <div></div> : <label id='addError' className='text-danger'>{addError}</label>}
@@ -197,8 +268,7 @@ const Person = () => {
                         <Button type='submit'
                                 variant="primary"
                                 id='addDetectionSubmit'
-                                disabled={addDisabled}
-                                onClick={onAddSession}>
+                                disabled={addDisabled || (detectionsFile === null) || (detectionNameField === '')}>
                             {addDisabled ? 'Adding...' : 'Add'}
                         </Button>
                     </Modal.Footer>
@@ -214,14 +284,14 @@ const Person = () => {
                     </Button>
                     <Button className='mx-1'
                             variant='primary'
-                            onClick={ null }>
+                            onClick={ logout }>
                         Log Out
                     </Button>
                 </div>
             </div>
             <div className='w-75 mx-auto py-2 d-flex flex-row justify-content-between'>
                 <header id='peopleHeader' className="fs-1">Detections</header>
-                <button disabled
+                <button disabled={true}
                         id='addDetectionButton'
                         type="button"
                         className="btn btn-lg btn-primary"

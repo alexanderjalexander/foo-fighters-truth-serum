@@ -1,21 +1,53 @@
-import React, {useContext, useState} from 'react';
+import React, {useState} from 'react';
 import {useNavigate} from "react-router-dom";
-import {UserContext} from "../components/UserContext";
+import {useUser} from "../components/UserContext";
+import {useMutation} from "@tanstack/react-query";
+import Dashboard from "./dashboard";
+import {Button} from "react-bootstrap";
 
 const Home = (props) => {
-    const {user, setUser} = useContext(UserContext);
-    const [loggedIn, setLoggedIn] = useState(!!user);
+    let user = useUser();
+    const [loggedIn, setLoggedIn] = useState(user.data !== null);
 
     const navigate = useNavigate();
 
-    const loginHandler = () => {
+    const loginHandler = async () => {
+        // Logic to handle the login button for the dashboard.
         if (loggedIn) {
             // Logged in, log the user out
             setLoggedIn(false);
-            setUser(null);
+            await logout();
         } else {
             // Logged out, start flow for logging in
             navigate('/login');
+        }
+    }
+
+    const LogoutMutation = useMutation({
+        mutationFn: () => {
+            return fetch('/api/logout', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                }
+            })
+        }
+    })
+
+    const logout = async () => {
+        const result = await LogoutMutation.mutateAsync(undefined, undefined);
+        const response = await result.json();
+        if (!result.ok) {
+            console.error('Logout Form Mutation Failed');
+            if (result.status === 500) {
+                console.error('A server error occurred')
+            } else if (result.status === 401) {
+                console.error(response.error);
+            }
+        } else {
+            console.log('Logout Form Mutation Succeeded');
+            console.log(response.message);
+            user.refetch();
         }
     }
 
@@ -25,38 +57,33 @@ const Home = (props) => {
 
     if (loggedIn) {
         return (
-            <div className="d-flex vh-100 text-center justify-content-center align-items-center">
-                <div>
-                    <header className="fs-1">Welcome!</header>
-                    <input type="button"
-                           className="btn btn-lg btn-primary"
-                           onClick={ loginHandler }
-                           value="Log Out"
-                    />
-                </div>
+            <div>
+                <Dashboard loginHandler={loginHandler}/>
             </div>
         )
     } else {
         return (
             <div className="d-flex vh-100 text-center justify-content-center align-items-center">
                 <div>
-                    <header className="fs-1">Truth Serum EEG</header>
-                    <input type="button"
-                           className="btn btn-lg btn-primary m-2 sd-inline"
-                           onClick={ loginHandler }
-                           value="Log In"
-                    />
-                    <input type="button"
-                           className="btn btn-lg btn-primary m-2 d-inline"
-                           onClick={ register }
-                           value="Register"
-                    />
+                    <header id='home-title' className="fs-1">Truth Serum EEG</header>
+                    <Button id='homeLoginButton'
+                            variant='primary'
+                            size='lg'
+                            className='m-2 d-inline'
+                            onClick={loginHandler}>
+                        Log In
+                    </Button>
+                    <Button id='homeRegisterButton'
+                            variant='primary'
+                            size='lg'
+                            className='m-2 d-inline'
+                            onClick={register}>
+                        Register
+                    </Button>
                 </div>
             </div>
         )
     }
-
-
 }
 
 export default Home

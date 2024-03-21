@@ -1,13 +1,13 @@
 import bcrypt from "bcryptjs";
 import { users } from "../config/mongo.js";
-import { checkPassword, checkEmail, stringifyId, requireId } from "../validation.js";
+import { checkPassword, checkEmail, stringifyId, requireId, StatusError } from "../validation.js";
 
 /**
  * @typedef User
  * @property {import("mongodb").ObjectId} _id The ObjectID for this user
  * @property {string?} hash The hash of the user's salted password
  * @property {string} email The email the user registered with
- * @property {string[]} people The people this user manages
+ * @property {import("./people.js").Person[]} people The people this user manages
  */
 
 /**
@@ -23,14 +23,14 @@ export const createUser = async (email, password) => {
   const usersCol = await users();
   const existingUser = await usersCol.findOne({ email });
   if (existingUser)
-    throw new Error("Email is already used by another account.");
+    throw new StatusError(400, "Email is already used by another account.");
   const res = await usersCol.insertOne({
     email,
     hash: await bcrypt.hash(password, 12),
     people: []
   });
   if (!res.acknowledged)
-    throw new Error("Could not add user to database.")
+    throw new Error("Failed to add user to database.")
 
   return {
     _id: res.insertedId.toString(),

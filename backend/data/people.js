@@ -1,13 +1,13 @@
 import { ObjectId } from "mongodb";
 import { users } from "../config/mongo.js";
-import { checkPersonName, requireId, stringifyId } from "../validation.js";
+import { StatusError, checkPersonName, requireId, stringifyId } from "../validation.js";
 import { getUserById } from "./users.js";
 
 /**
  * @typedef Person
  * @property {ObjectId} _id The ObjectID for this Person
  * @property {string} name The name of this Person
- * @property {any[]} detections The detections stored on this Person 
+ * @property {import("./detections.js").Detection[]} detections The detections stored on this Person 
  */
 
 /**
@@ -20,7 +20,7 @@ export const getPersonByName = async (userId, personName) => {
   userId = requireId(userId);
 
   if (!(await getUserById(userId)))
-    throw new Error('User does not exist.');
+    throw new StatusError(404, 'User does not exist.');
 
   const usersCol = await users();
   const userPerson = await usersCol.findOne(
@@ -53,7 +53,7 @@ export const getPersonById = async (userId, personId) => {
   personId = requireId(personId, "Person id")
 
   if (!(await getUserById(userId)))
-    throw new Error('User does not exist.');
+    throw new StatusError(404, 'User does not exist.');
 
   const usersCol = await users();
   const userPerson = await usersCol.findOne(
@@ -86,10 +86,10 @@ export const createPerson = async (userId, personName) => {
   personName = checkPersonName(personName);
 
   if (!(await getUserById(userId)))
-    throw new Error('User does not exist.');
+    throw new StatusError(404, 'User does not exist.');
 
   if (await getPersonByName(userId, personName))
-    throw new Error('A person with that name exists already.');
+    throw new StatusError(400, 'A person with that name exists already.');
 
   const person = {
     _id: new ObjectId(),
@@ -121,7 +121,7 @@ export const renamePerson = async (userId, personId, newName) => {
   newName = checkPersonName(newName);
 
   if (!(await getPersonById(userId, personId)))
-    throw new Error('Person does not exist.');
+    throw new StatusError(404, 'Person does not exist.');
 
   const usersCol = await users();
   const res = await usersCol.updateOne(
@@ -148,8 +148,8 @@ export const renamePerson = async (userId, personId, newName) => {
 
 /**
  * Deletes a Person from a User.
- * @param {string|ObjectId} userId The ID of the user containing the person.
- * @param {string|ObjectId} personId The ID of the person to delete.
+ * @param {string|ObjectId} userId The ID of the User containing the Person.
+ * @param {string|ObjectId} personId The ID of the Person to delete.
  * @returns {Promise<import("./users.js").User>} The updated User data.
  */
 export const deletePerson = async (userId, personId) => {
@@ -157,7 +157,7 @@ export const deletePerson = async (userId, personId) => {
   personId = requireId(personId, 'Person ID');
 
   if (!(await getPersonById(userId, personId)))
-    throw new Error('Person does not exist.');
+    throw new StatusError(404, 'Person does not exist.');
 
   const usersCol = await users();
   const res = await usersCol.updateOne(
@@ -179,3 +179,33 @@ export const deletePerson = async (userId, personId) => {
 
   return await getUserById(userId);
 };
+
+/**
+ * Gets all Detections from a Person.
+ * @param {string|ObjectId} userId The ID of the User containing the Person.
+ * @param {string|ObjectId} personId The ID of the Person with the Detections.
+ * @returns {Promise<import("./detections.js").Detection[]>} The Detections.
+ */
+export const getAllDetections = async (userId, personId) => {
+  userId = requireId(userId, 'User ID');
+  personId = requireId(personId, 'Person ID');
+
+  const usersCol = await users();
+  const userPerson = await usersCol.findOne(
+    {
+      _id: userId,
+      people: { 
+        $elemMatch: {
+          _id: personId
+        }
+      }
+    },
+    {
+      projection: {
+        "people.$": 1
+      }
+    }
+  );
+
+  return userPerson.people[0].detections;
+}

@@ -15,13 +15,23 @@ app.use(
   session({
     name: "sessionCookie",
     secret: "NJTransitFareHikeComingJuly",
-    saveUninitialized: false, //set to true to create a session for testing
+    saveUninitialized: false, 
     resave: false,
-    cookie: { maxAge: 1000 * 60 * 10 }, //10 minutes
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+    },
   })
 );
-
 configRoutes(app);
+// eslint-disable-next-line no-unused-vars
+app.use((err, _req, res, _next) => {
+  const status = err.status || 500;
+  const message = (err.status !== 500 && err.message) || 'Internal Server Error';
+  if (status === 500) {
+    console.error(err);
+  }
+  res.status(status).json({ error: message });
+});
 
 // All client pages
 app.get("*", (req, res) => {
@@ -44,4 +54,4 @@ const closeServer = async () => {
   await closeConnection();
 };
 
-export { closeServer};
+export { closeServer };

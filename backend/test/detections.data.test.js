@@ -1,9 +1,10 @@
 import "dotenv/config";
-import { expect, test } from '@jest/globals';
+import { expect, test, afterAll, beforeAll, beforeEach } from '@jest/globals';
 import { closeConnection, detections, users } from '../config/mongo.js';
 import { ObjectId } from "mongodb";
 import { createDetection, deleteDetection, renameDetection } from "../data/detections.js";
 import { getUserById } from "../data/users.js";
+import { StatusError } from "../validation.js";
 
 const _id = new ObjectId("000000646574656374696F6E");
 
@@ -43,7 +44,7 @@ test('createDetection: Cannot create detection on invalid user', async () => {
     "Session 1",
     "dummy data"
   )).rejects.toEqual(
-    new Error("User does not exist.")
+    new StatusError(404, "User does not exist.")
   );
   await expect(createDetection(
     _id,
@@ -51,7 +52,7 @@ test('createDetection: Cannot create detection on invalid user', async () => {
     "Session 1",
     "dummy data"
   )).rejects.toEqual(
-    new Error("Person does not exist.")
+    new StatusError(404, "Person does not exist.")
   );
 });
 
@@ -62,7 +63,7 @@ test('createDetection: Cannot create detection with invalid name', async () => {
     "                ",
     "dummy data"
   )).rejects.toEqual(
-    new Error("Detection name must be a non-empty string.")
+    new StatusError(400, "Detection name must be a non-empty string.")
   );
 });
 
@@ -93,13 +94,13 @@ test('renameDetection: Cannot rename non-existant detection', async () => {
     "100000000000000000000000",
     "Session 13892"
   )).rejects.toEqual(
-    new Error("Detection does not exist.")
+    new StatusError(404, "Detection does not exist.")
   );
 });
 
 test('renameDetection: Cannot rename detection to invalid name', async () => {
   await expect(renameDetection(_id, "                   ")).rejects.toEqual(
-    new Error("Detection name must be a non-empty string.")
+    new StatusError(400, "Detection name must be a non-empty string.")
   );
 });
 
@@ -114,7 +115,7 @@ test('renameDetection: Can rename detection to valid name', async () => {
 
 test('deleteDetection: Cannot delete non-existant detection', async () => {
   await expect(deleteDetection("100000000000000000000000")).rejects.toEqual(
-    new Error("Detection does not exist.")
+    new StatusError(404, "Detection does not exist.")
   );
 });
 

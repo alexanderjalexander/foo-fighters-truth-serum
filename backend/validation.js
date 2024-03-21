@@ -1,5 +1,12 @@
 import { ObjectId } from "mongodb";
 
+export class StatusError extends Error {
+  constructor(status, message) {
+    super(message);
+    this.status = status;
+  }
+}
+
 /**
  * Asserts that a value is of type string. Errors if it isn't.
  * @param {any} value Value to assert a string type on.
@@ -9,7 +16,7 @@ import { ObjectId } from "mongodb";
  */
 export const requireString = (value, name, trim = true) => {
   if (!value || typeof value !== 'string' || (trim && !(value = value.trim())))
-    throw new Error(`${name} must be a non-empty string.`);
+    throw new StatusError(400, `${name} must be a non-empty string.`);
   return value;
 };
 
@@ -21,7 +28,7 @@ export const requireString = (value, name, trim = true) => {
  */
 export const requireId = (value, name) => {
   if (!value || !ObjectId.isValid(value))
-    throw new Error(`${name} must be a valid ID.`);
+    throw new StatusError(400, `${name} must be a valid ID.`);
   return new ObjectId(value);
 }
 
@@ -32,8 +39,8 @@ export const requireId = (value, name) => {
  */
 export const checkEmail = (value) => {
   value = requireString(value, 'Email');
-  if (!(/^[^@]+@[a-z0-9.\-]+\.[a-z]{2,}$/i).test(value))
-    throw new Error("Provided email address isn't valid.");
+  if (!(/^[^@]+@[a-z0-9.-]+\.[a-z]{2,}$/i).test(value))
+    throw new StatusError(400, "Provided email address isn't valid.");
   return value;
 };
 
@@ -44,15 +51,15 @@ export const checkEmail = (value) => {
 export const checkPassword = (value) => {
   requireString(value, 'Password', false);
   if (value.length < 10)
-    throw new Error("Password must be at least 10 characters long.");
+    throw new StatusError(400, "Password must be at least 10 characters long.");
   if (!(/[a-z]/).test(value))
-    throw new Error("Password must have at least 1 lower case letter.");
+    throw new StatusError(400, "Password must have at least 1 lower case letter.");
   if (!(/[A-Z]/).test(value))
-    throw new Error("Password must have at least 1 upper case letter.");
+    throw new StatusError(400, "Password must have at least 1 upper case letter.");
   if (!(/[0-9]/).test(value))
-    throw new Error("Password must have at least 1 number.");
+    throw new StatusError(400, "Password must have at least 1 number.");
   if (!(/[^a-zA-Z0-9]/).test(value))
-    throw new Error("Password must have at least 1 non alphanumeric character.");
+    throw new StatusError(400, "Password must have at least 1 non alphanumeric character.");
 };
 
 /**
@@ -81,7 +88,7 @@ export const stringifyId = (obj) => {
 export const checkPersonName = (name) => {
   name = requireString(name, 'Person name');
   if (name.length < 3)
-    throw new Error('Person name must be at least 3 characters long.');
+    throw new StatusError(400, 'Person name must be at least 3 characters long.');
   return name;
 };
 
@@ -93,3 +100,5 @@ export const checkPersonName = (name) => {
 export const requireData = (data) => {
   return data;
 };
+
+export const sync = f => (req, res, next) => f(req, res, next).catch(next);

@@ -1,7 +1,8 @@
 import "dotenv/config";
-import { expect, test } from '@jest/globals';
+import { expect, test, afterAll } from '@jest/globals';
 import { createUser, verifyUser } from "../data/users.js";
 import { closeConnection, users } from '../config/mongo.js';
+import { StatusError } from "../validation.js";
 
 afterAll(async () => {
   await closeConnection();
@@ -12,19 +13,19 @@ test('createUser: Cannot create user with invalid email', async () => {
     "ThisIsNot@A@ValidEmail.com",
     "Str0ngS3cur!ty"
   )).rejects.toEqual(
-    new Error("Provided email address isn't valid.")
+    new StatusError(400, "Provided email address isn't valid.")
   );
   await expect(createUser(
     "Missing@TLD",
     "Str0ngS3cur!ty"
   )).rejects.toEqual(
-    new Error("Provided email address isn't valid.")
+    new StatusError(400, "Provided email address isn't valid.")
   );
   await expect(createUser(
     "@NoUser.com",
     "Str0ngS3cur!ty"
   )).rejects.toEqual(
-    new Error("Provided email address isn't valid.")
+    new StatusError(400, "Provided email address isn't valid.")
   );
 });
 
@@ -33,31 +34,31 @@ test('createUser: Cannot create user with invalid password', async () => {
     "user1@example.com",
     "Str0ng"
   )).rejects.toEqual(
-    new Error("Password must be at least 10 characters long.")
+    new StatusError(400,"Password must be at least 10 characters long.")
   );
   await expect(createUser(
     "user2@example.com",
     "str0ngs3cur!ty"
   )).rejects.toEqual(
-    new Error("Password must have at least 1 upper case letter.")
+    new StatusError(400, "Password must have at least 1 upper case letter.")
   );
   await expect(createUser(
     "user3@example.com",
     "STR0NGS3CUR!TY"
   )).rejects.toEqual(
-    new Error("Password must have at least 1 lower case letter.")
+    new StatusError(400, "Password must have at least 1 lower case letter.")
   );
   await expect(createUser(
     "user4@example.com",
     "StrongSecur!ty"
   )).rejects.toEqual(
-    new Error("Password must have at least 1 number.")
+    new StatusError(400, "Password must have at least 1 number.")
   );
   await expect(createUser(
     "user5@example.com",
     "Str0ngS3curity"
   )).rejects.toEqual(
-    new Error("Password must have at least 1 non alphanumeric character.")
+    new StatusError(400, "Password must have at least 1 non alphanumeric character.")
   );
 });
 
@@ -90,7 +91,7 @@ test('createUser: Cannot create 2 users with the same email', async () => {
     "user7@example.com",
     "Str0ngS3cur!ty"
   )).rejects.toEqual(
-    new Error("Email is already used by another account.")
+    new StatusError(400, "Email is already used by another account.")
   );
   // Check DB
   const usersCol = await users();

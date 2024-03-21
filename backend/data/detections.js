@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { detections, users } from "../config/mongo.js";
-import { requireData, requireId, requireString, stringifyId } from "../validation.js";
+import { StatusError, requireData, requireId, requireString } from "../validation.js";
 import { getPersonById } from "./people.js";
 
 /**
@@ -36,7 +36,7 @@ export const createDetection = async (userId, personId, name, data) => {
   name = requireString(name, "Detection name");
   data = requireData(data);
   const person = await getPersonById(userId, personId);
-  if (!person) throw new Error("Person does not exist.");
+  if (!person) throw new StatusError(404, "Person does not exist.");
 
   const detection = {
     _id: new ObjectId(),
@@ -81,7 +81,7 @@ export const renameDetection = async (id, newName) => {
   id = requireId(id, "Detection ID");
   newName = requireString(newName, "Detection name");
   if (!(await getDetection(id)))
-    throw new Error("Detection does not exist.");
+    throw new StatusError(404, "Detection does not exist.");
 
   const detectionsCol = await detections();
   const detectionRes = await detectionsCol.updateOne(
@@ -103,7 +103,7 @@ export const renameDetection = async (id, newName) => {
 export const deleteDetection = async (id) => {
   id = requireId(id, "Detection ID");
   if (!(await getDetection(id)))
-    throw new Error("Detection does not exist.");
+    throw new StatusError(404, "Detection does not exist.");
 
   const detectionsCol = await detections();
   const res = await detectionsCol.deleteOne({ _id: id });

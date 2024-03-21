@@ -1,8 +1,6 @@
 {
   "devDependencies": {
-    "supertest-session": "^5.0.1"
-  },
-  "dependencies": {
-    "multer": "^1.4.5-lts.1"
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.1"
   }
 }

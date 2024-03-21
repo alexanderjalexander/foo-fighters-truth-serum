@@ -1,9 +1,10 @@
 import "dotenv/config";
-import { expect, test } from '@jest/globals';
+import { expect, test, beforeEach, afterAll } from '@jest/globals';
 import { closeConnection, users } from '../config/mongo.js';
 import { ObjectId } from "mongodb";
 import { createPerson, deletePerson, renamePerson } from "../data/people.js";
 import { getUserById } from "../data/users.js";
+import { StatusError } from "../validation.js";
 
 beforeEach(async () => {
   const usersCol = await users();
@@ -26,13 +27,13 @@ test('createPerson: Cannot create person on invalid user', async () => {
     "000000000000000000000001",
     "Jack"
   )).rejects.toEqual(
-    new Error("User does not exist.")
+    new StatusError(404, "User does not exist.")
   );
   await expect(createPerson(
     "00000000000000000000",
     "Jill"
   )).rejects.toEqual(
-    new Error("User ID must be a valid ID.")
+    new StatusError(400, "User ID must be a valid ID.")
   );
 });
 
@@ -41,13 +42,13 @@ test('createPerson: Cannot create person with invalid name', async () => {
     "000000000000000000000000",
     "Sh"
   )).rejects.toEqual(
-    new Error("Person name must be at least 3 characters long.")
+    new StatusError(400, "Person name must be at least 3 characters long.")
   );
   await expect(createPerson(
     "000000000000000000000000",
     "   Or   "
   )).rejects.toEqual(
-    new Error("Person name must be at least 3 characters long.")
+    new StatusError(400, "Person name must be at least 3 characters long.")
   );
 });
 
@@ -92,7 +93,7 @@ test('createPerson: Cannot create two people with same name on same user.', asyn
     "000000000000000000000000",
     "Jack"
   )).rejects.toEqual(
-    new Error("A person with that name exists already.")
+    new StatusError(400, "A person with that name exists already.")
   );
   const user = await getUserById(new ObjectId("000000000000000000000000"));
   expect(user.people.length).toEqual(1);
@@ -132,7 +133,7 @@ test('renamePerson: Cannot rename a non-existant person.', async () => {
     "000000000000000000000000",
     "New Name"
   )).rejects.toEqual(
-    new Error("Person does not exist.")
+    new StatusError(404, "Person does not exist.")
   );
 });
 
@@ -156,7 +157,7 @@ test('deletePerson: Cannot delete a non-existant person.', async () => {
     "000000000000000000000000",
     "000000000000000000000000"
   )).rejects.toEqual(
-    new Error("Person does not exist.")
+    new StatusError(404, "Person does not exist.")
   );
 });
 

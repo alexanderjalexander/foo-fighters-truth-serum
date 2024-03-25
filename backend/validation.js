@@ -100,5 +100,3 @@ export const checkPersonName = (name) => {
 export const requireData = (data) => {
   return data;
 };
-
-export const sync = f => (req, res, next) => f(req, res, next).catch(next);

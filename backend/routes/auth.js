@@ -1,5 +1,5 @@
 import { createUser, verifyUser } from "../data/users.js";
-import { sync } from "../validation.js";
+import { sync } from "./middleware.js";
 
 export const meRoute = sync(async (req, res) => {
   if (req.session.user) {

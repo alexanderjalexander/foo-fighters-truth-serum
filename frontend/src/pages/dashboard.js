@@ -1,6 +1,6 @@
 import React, {useState} from "react";
-import {useMutation, useQuery} from "@tanstack/react-query";
 import {Button, ListGroup, Form, Modal, Spinner, Badge} from "react-bootstrap";
+import {useAddPersonMutation, useGetAllPeopleQuery} from "../query/people";
 
 const Dashboard = ({loginHandler}) => {
     // Obtaining People Query
@@ -8,21 +8,7 @@ const Dashboard = ({loginHandler}) => {
         isError,
         error,
         refetch,
-        data} = useQuery({
-        queryKey: ['getAllPeople'],
-        queryFn: async () => {
-            const result = await fetch('/api/getAllPeople', {
-                method: 'GET',
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            })
-            if (!result.ok) {
-                return null;
-            }
-            return await result.json();
-        }
-    });
+        data} = useGetAllPeopleQuery();
 
     // Displaying the People
     let people;
@@ -40,7 +26,7 @@ const Dashboard = ({loginHandler}) => {
             <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
                 <div>
                     <header className="fs-1">Error</header>
-                    <p>{error.toString()}</p>
+                    <p>{error.status}: {error.message}</p>
                 </div>
             </div>
         );
@@ -55,21 +41,16 @@ const Dashboard = ({loginHandler}) => {
             </div>
         )
     }
-    else if (data.peopleRes.length === 0) {
-        people = (
-            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
-                <p>No people yet! Add a person with the 'Add' button at the top.</p>
-            </div>
-        )
-    }
     else {
         people = (
             <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
                 <ListGroup className='w-100'>
-                    {data.peopleRes.map((person) => (
+                    {data.length === 0
+                        ? (<p>No people yet! Add a person with the 'Add' button at the top.</p>)
+                        : data.map((person) => (
                         <ListGroup.Item id={`${person.name}`}
                                         className='text-start'
-                                        href={`/${person.id}`}
+                                        href={`/${person._id}`}
                                         key={person.name}
                                         action>
                             {person.name}
@@ -80,19 +61,6 @@ const Dashboard = ({loginHandler}) => {
             </div>
         )
     }
-
-    // Add Person Form Mutation
-    const AddPersonMutation = useMutation({
-        mutationFn: () => {
-            return fetch('/api/addNewPerson', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({personName: name}),
-            })
-        }
-    });
 
     // Modal States and Form Control
     const [modalShow, setModalShow] = useState(false);
@@ -106,24 +74,21 @@ const Dashboard = ({loginHandler}) => {
     const ShowModal = () => setModalShow(true);
     const HideModal = () => setModalShow(false);
 
+    // Add Person Form Mutation
+    const AddPersonMutation = useAddPersonMutation(name);
     const onAddPerson = async (e) => {
         e.preventDefault();
         setAddDisabled(true);
-        const result = await AddPersonMutation.mutateAsync(undefined, undefined);
-        const response = await result.json();
-        if (!result.ok) {
-            console.error('Add Person Form Mutation Failed');
-            console.error(response.status);
-            console.error(response.error);
-            setAddError(response.status + ':' + response.error);
-            setAddDisabled(false);
-        } else {
-            console.log(response.message);
-            setAddDisabled(false);
+        try {
+            await AddPersonMutation.mutateAsync(undefined, undefined);
+            await refetch();
             updateName('');
             HideModal();
-            await refetch();
+        } catch (e) {
+            console.error('Add Person Form Mutation Failed');
+            setAddError(e.status + ':' + e.message);
         }
+        setAddDisabled(false);
     };
 
     return (
@@ -178,7 +143,9 @@ const Dashboard = ({loginHandler}) => {
                     Add
                 </button>
             </div>
-            {people}
+            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
+                {people}
+            </div>
         </div>
     )
 }

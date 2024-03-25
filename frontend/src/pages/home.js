@@ -1,11 +1,12 @@
 import React, {useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import {useUser} from "../components/UserContext";
-import {useMutation} from "@tanstack/react-query";
 import Dashboard from "./dashboard";
 import {Button} from "react-bootstrap";
+import {useLogoutMutation} from "../query/auth";
+import FlexCenterWrapper from "../components/FlexCenterWrapper";
 
-const Home = (props) => {
+const Home = () => {
     let user = useUser();
     const [loggedIn, setLoggedIn] = useState(user.data !== null);
 
@@ -23,31 +24,16 @@ const Home = (props) => {
         }
     }
 
-    const LogoutMutation = useMutation({
-        mutationFn: () => {
-            return fetch('/api/logout', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            })
-        }
-    })
+    const LogoutMutation = useLogoutMutation();
 
     const logout = async () => {
-        const result = await LogoutMutation.mutateAsync(undefined, undefined);
-        const response = await result.json();
-        if (!result.ok) {
-            console.error('Logout Form Mutation Failed');
-            if (result.status === 500) {
-                console.error('A server error occurred')
-            } else if (result.status === 401) {
-                console.error(response.error);
-            }
-        } else {
+        try {
+            await LogoutMutation.mutateAsync(undefined, undefined);
             console.log('Logout Form Mutation Succeeded');
-            console.log(response.message);
-            user.refetch();
+            await user.refetch();
+        } catch (e) {
+            console.error('Logout Form Mutation Failed');
+            console.error(e);
         }
     }
 
@@ -63,7 +49,7 @@ const Home = (props) => {
         )
     } else {
         return (
-            <div className="d-flex vh-100 text-center justify-content-center align-items-center">
+            <FlexCenterWrapper>
                 <div>
                     <header id='home-title' className="fs-1">Truth Serum EEG</header>
                     <Button id='homeLoginButton'
@@ -81,7 +67,7 @@ const Home = (props) => {
                         Register
                     </Button>
                 </div>
-            </div>
+            </FlexCenterWrapper>
         )
     }
 }

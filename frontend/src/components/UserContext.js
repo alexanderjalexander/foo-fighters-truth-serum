@@ -1,5 +1,6 @@
 import React, {createContext, useContext} from 'react';
-import {useQuery} from "@tanstack/react-query";
+import {useMeQuery} from "../query/auth";
+import FlexCenterWrapper from "./FlexCenterWrapper";
 
 const UserContext = createContext(null);
 
@@ -8,49 +9,30 @@ export function useUser() {
 }
 
 export const AuthWrapper = ({children}) => {
-    // await stuff here and then hopefully get stuff back?????
-    const {isPending,
-        isError,
-        error,
-        refetch,
-        data} = useQuery({
-        queryKey: ['userSession'],
-        queryFn: async () => {
-            const result = await fetch('/api/checkSession', {
-                method: 'GET',
-                headers: {
-                    "Content-Type": "application/json",
-                }
-            })
-            if (!result.ok) {
-                return null;
-            }
-            return await result.json();
-        }
-    });
+    let me = useMeQuery();
 
-    if (isPending) {
+    if (me.isPending) {
         return (
-            <div className="d-flex vh-100 text-center justify-content-center align-items-center">
+            <FlexCenterWrapper>
                 <div className="spinner-border" role="status">
                     <span className="visually-hidden">Loading...</span>
                 </div>
-            </div>
+            </FlexCenterWrapper>
         )
     }
-    else if (isError) {
+    else if (me.isError) {
         return (
-            <div className="d-flex vh-100 text-center justify-content-center align-items-center">
+            <FlexCenterWrapper>
                 <div>
                     <header className="fs-1">Error</header>
-                    <p>{error.toString()}</p>
+                    <p>{me.error.toString()}</p>
                 </div>
-            </div>
+            </FlexCenterWrapper>
         )
     }
 
     return (
-        <UserContext.Provider value={{data, refetch}}>
+        <UserContext.Provider value={{data: me.data, refetch: me.refetch}}>
             {children}
         </UserContext.Provider>
     )

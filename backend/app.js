@@ -9,6 +9,7 @@ import { closeConnection } from "./config/mongo.js";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
+app.use(express.static('./build'));
 app.use(express.json());
 app.use(cookieParser());
 app.use(
@@ -35,7 +36,7 @@ app.use((err, _req, res, _next) => {
 
 // All client pages
 app.get("*", (req, res) => {
-  res.sendFile(join(__dirname, "/../frontend/build/index.html"));
+  res.sendFile(join(__dirname, "./build/index.html"));
 });
 
 const server = await new Promise(resolve => {

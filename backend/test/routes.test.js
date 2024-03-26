@@ -1,9 +1,11 @@
 import "dotenv/config";
 import { expect, test } from "@jest/globals";
 import supertest from "supertest";
-import { app } from "../app";
+import { server, closeServer } from "../app";
 
-const agent = supertest.agent(app);
+const agent = supertest.agent(server);
+
+afterAll(async () => await closeServer());
 
 const reqWithCreds = async (route, email, password) =>
   await agent.post(`/api${route}`)

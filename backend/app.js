@@ -39,22 +39,18 @@ app.get("*", (req, res) => {
   res.sendFile(join(__dirname, "./build/index.html"));
 });
 
-let server;
-if (process.env.NODE_ENV !== 'test') {
-  server = await new Promise(resolve => {
-    const returnedServer = app.listen(4000, () => {
+export const server = await new Promise(resolve => {
+  const returnedServer = app.listen(4000, () => {
+    if (process.env.NODE_ENV !== 'test')
       console.log(`App started at http://localhost:${returnedServer.address().port}`);
-      resolve(returnedServer);
-    });
+    resolve(returnedServer);
   });
-}
+});
 
 
-const closeServer = async () => {
+export const closeServer = async () => {
   await new Promise((resolve, reject) => server.close((err) => {
     err ? reject(err) : resolve();
   }));
   await closeConnection();
 };
-
-export { closeServer };

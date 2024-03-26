@@ -1,7 +1,9 @@
+import * as tf from '@tensorflow/tfjs';
 import { ObjectId } from "mongodb";
 import { detections, users } from "../config/mongo.js";
 import { StatusError, requireData, requireId, requireString } from "../validation.js";
 import { getPersonById } from "./people.js";
+import { model } from '../app.js';
 
 /**
  * @typedef Detection
@@ -112,3 +114,22 @@ export const deleteDetection = async (id) => {
   if (!res.acknowledged)
     throw new Error("Failed to delete detection.");
 };
+
+/**
+ * Runs the prediction model on a given file.
+ * @param {any} file A file object straight from the web request
+ */
+export const runDetection = async (file) => {
+  const data = file.buffer.toString();
+  const prediction = model.predict(
+    tf.tensor3d(
+      [
+        [
+          [5.57764,-18.68978,0.12047,-11.03442,13.27478]
+        ]
+      ]
+    )
+  );
+  const result = await prediction.data();
+  return result[0][1] > result[0][0];
+}

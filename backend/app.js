@@ -1,3 +1,4 @@
+import * as tf from '@tensorflow/tfjs';
 import express from "express";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
@@ -9,6 +10,7 @@ import { closeConnection } from "./config/mongo.js";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export const app = express();
+app.use("/api/model", express.static('./model'));
 app.use(express.static('./build'));
 app.use(express.json());
 app.use(cookieParser());
@@ -47,6 +49,7 @@ export const server = await new Promise(resolve => {
   });
 });
 
+export const model = await tf.loadLayersModel("http://localhost:4000/api/model/model.json");
 
 export const closeServer = async () => {
   await new Promise((resolve, reject) => server.close((err) => {

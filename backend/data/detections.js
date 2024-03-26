@@ -3,7 +3,9 @@ import { ObjectId } from "mongodb";
 import { detections, users } from "../config/mongo.js";
 import { StatusError, requireData, requireId, requireString } from "../validation.js";
 import { getPersonById } from "./people.js";
-import { model } from '../app.js';
+
+let model;
+setTimeout(async () => (model = await tf.loadLayersModel("http://localhost:4000/api/model/model.json")), 3000);
 
 /**
  * @typedef Detection

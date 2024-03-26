@@ -49,8 +49,6 @@ export const server = await new Promise(resolve => {
   });
 });
 
-export const model = await tf.loadLayersModel("http://localhost:4000/api/model/model.json");
-
 export const closeServer = async () => {
   await new Promise((resolve, reject) => server.close((err) => {
     err ? reject(err) : resolve();

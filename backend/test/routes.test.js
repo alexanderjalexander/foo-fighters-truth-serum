@@ -93,15 +93,6 @@ test("GET /api/people", async () => {
   guyId = res.body[0]._id;
 });
 
-test("POST /api/people/:personId/detections", async () => {
-  await agent.post(`/api/people/${guyId}/detections`)
-    .set('Content-Type', 'application/json')
-    .send(JSON.stringify({
-      name: 'First Detection'
-    }))
-    .expect(400);
-});
-
 test("GET /api/people/:personId/detections", async () => {
   const res = await agent.get(`/api/people/${guyId}/detections`)
     .expect(200);

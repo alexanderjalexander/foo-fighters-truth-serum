@@ -28,5 +28,5 @@ jobs:
         cache: 'npm'
     - run: npm ci --prefix backend
     - run: npm ci --prefix frontend
-    - run: npm build
-    - run: npm test --prefix backend
+    - run: npm run build
+    - run: npm run test --prefix backend

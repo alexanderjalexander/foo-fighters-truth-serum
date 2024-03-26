@@ -8,7 +8,7 @@ import { closeConnection } from "./config/mongo.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const app = express();
+export const app = express();
 app.use(express.static('./build'));
 app.use(express.json());
 app.use(cookieParser());
@@ -39,13 +39,15 @@ app.get("*", (req, res) => {
   res.sendFile(join(__dirname, "./build/index.html"));
 });
 
-const server = await new Promise(resolve => {
-  const server = app.listen(4000, () => {
-    if (process.env.NODE_ENV !== 'test')
-      console.log(`App started at http://localhost:${server.address().port}`);
-    resolve(server);
+let server;
+if (process.env.NODE_ENV !== 'test') {
+  server = await new Promise(resolve => {
+    const returnedServer = app.listen(4000, () => {
+      console.log(`App started at http://localhost:${returnedServer.address().port}`);
+      resolve(returnedServer);
+    });
   });
-});
+}
 
 
 const closeServer = async () => {

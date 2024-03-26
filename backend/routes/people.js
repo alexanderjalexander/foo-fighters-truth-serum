@@ -4,7 +4,7 @@ import { getUserById } from "../data/users.js";
 import { checkAuth, sync } from "./middleware.js";
 import multer from "multer";
 import { createDetection } from "../data/detections.js";
-import { exec } from "child_process";
+import { exec, execSync } from "child_process";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 
@@ -44,7 +44,7 @@ router.post('/:personId/detections', multer().single('file'), checkAuth, sync(as
       });
       child.stdin.write(file.buffer);
     });
-  
+
     await createDetection(req.session.user._id, req.params.personId, detectionName, file, output.endsWith("truth"));
     res.status(200).json();
   } catch (e) {

@@ -6,6 +6,9 @@ This is a platform for ML-powered lie detection using data from an EEG machine.
 
 ## Setup
 
+### Dependencies
+- Python 3.11
+
 ### Installation
 1. Run `npm i` in the `backend` directory
 2. Run `npm i` in the `frontend` directory

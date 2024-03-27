@@ -191,21 +191,21 @@ export const getAllDetections = async (userId, personId) => {
   personId = requireId(personId, 'Person ID');
 
   const usersCol = await users();
-  const userPerson = await usersCol.findOne(
+  return await usersCol.aggregate([
+    { $match: { _id: userId } },
+    { $unwind: '$people' },
+    { $match: { 'people._id': personId } },
+    { $unwind: '$people.detections' },
     {
-      _id: userId,
-      people: { 
-        $elemMatch: {
-          _id: personId
-        }
+      $lookup: {
+        from: 'detections', 
+        localField: 'people.detections', 
+        foreignField: '_id', 
+        as: 'detection'
       }
     },
-    {
-      projection: {
-        "people.$": 1
-      }
-    }
-  );
-
-  return userPerson.people[0].detections;
+    { $unwind: '$detection' },
+    { $replaceRoot: { newRoot: '$detection' } },
+    { $project: { data: 0 } }
+  ]).toArray();
 }

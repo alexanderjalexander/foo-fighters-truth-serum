@@ -5,7 +5,8 @@ import { StatusError, requireData, requireId, requireString } from "../validatio
 import { getPersonById } from "./people.js";
 
 let model;
-setTimeout(async () => (model = await tf.loadLayersModel("http://localhost:4000/api/model/model.json")), 3000);
+if (process.env.NODE_ENV !== 'test')
+  setTimeout(async () => (model = await tf.loadLayersModel("http://localhost:4000/api/model/model.json")), 3000);
 
 /**
  * @typedef Detection

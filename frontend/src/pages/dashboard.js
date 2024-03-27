@@ -14,40 +14,33 @@ const Dashboard = ({loginHandler}) => {
     let people;
     if (isPending) {
         people = (
-            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
-                <Spinner animation='border' role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </Spinner>
-            </div>
+            <Spinner animation='border' role="status">
+                <span className="visually-hidden">Loading...</span>
+            </Spinner>
         );
     }
     else if (isError) {
         people = (
-            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
-                <div>
-                    <header className="fs-1">Error</header>
-                    <p>{error.status}: {error.message}</p>
-                </div>
+            <div>
+                <header className="fs-1">Error</header>
+                <p>{error.status}: {error.message}</p>
             </div>
-        );
+        )
     }
     else if (data === null) {
         people = (
-            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
-                <div>
-                    <header className="fs-1">Error</header>
-                    <p>An error occurred while fetching people(data was null). Try logging out and back in.</p>
-                </div>
+            <div>
+                <header className="fs-1">Error</header>
+                <p>An error occurred while fetching people(data was null). Try logging out and back in.</p>
             </div>
         )
     }
     else {
         people = (
-            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
-                <ListGroup className='w-100'>
-                    {data.length === 0
-                        ? (<p>No people yet! Add a person with the 'Add' button at the top.</p>)
-                        : data.map((person) => (
+            <ListGroup className='w-100'>
+                {data.length === 0
+                    ? (<p>No people yet! Add a person with the 'Add' button at the top.</p>)
+                    : data.map((person) => (
                         <ListGroup.Item id={`${person.name}`}
                                         className='text-start'
                                         href={`/${person._id}`}
@@ -57,8 +50,7 @@ const Dashboard = ({loginHandler}) => {
                             <Badge className='m-1' bg='primary'>{person.numDetections}</Badge>
                         </ListGroup.Item>
                     ))}
-                </ListGroup>
-            </div>
+            </ListGroup>
         )
     }
 

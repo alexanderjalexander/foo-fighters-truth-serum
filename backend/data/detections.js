@@ -122,16 +122,8 @@ export const deleteDetection = async (id) => {
  * @param {any} file A file object straight from the web request
  */
 export const runDetection = async (file) => {
-  const data = file.buffer.toString();
-  const prediction = model.predict(
-    tf.tensor3d(
-      [
-        [
-          [5.57764,-18.68978,0.12047,-11.03442,13.27478]
-        ]
-      ]
-    )
-  );
+  const data = file.buffer.toString().split(',').map(v=>+v);
+  const prediction = model.predict(tf.tensor3d([[data]]));
   const result = await prediction.data();
   return result[0][1] > result[0][0];
 }

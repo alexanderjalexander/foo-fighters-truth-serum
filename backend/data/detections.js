@@ -125,5 +125,5 @@ export const runDetection = async (file) => {
   const data = file.buffer.toString().split(',').map(v=>+v);
   const prediction = model.predict(tf.tensor3d([[data]]));
   const result = await prediction.data();
-  return result[0][1] > result[0][0];
+  return result[1] > result[0];
 }

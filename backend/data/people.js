@@ -206,6 +206,6 @@ export const getAllDetections = async (userId, personId) => {
     },
     { $unwind: '$detection' },
     { $replaceRoot: { newRoot: '$detection' } },
-    { $project: { data: 0 } }
+    { $project: { data: 0, owner: 0 } }
   ]).toArray();
 }

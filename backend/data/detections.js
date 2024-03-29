@@ -11,7 +11,10 @@ if (process.env.NODE_ENV !== 'test')
 /**
  * @typedef Detection
  * @property {ObjectId} _id The ObjectID for this Detection
+ * @property {ObjectId} owner The ID of the User owner of this Detection
  * @property {string} name The name of this Detection
+ * @property {boolean} truth If this Detection is truthful
+ * @property {boolean} flagged If this Detection is wrong
  * @property {any} data The data stored in this Detection 
  */
 
@@ -46,8 +49,10 @@ export const createDetection = async (userId, personId, name, data, truth) => {
 
   const detection = {
     _id: new ObjectId(),
+    owner: userId,
     name,
     truth,
+    flagged: false,
     data
   };
 
@@ -116,6 +121,27 @@ export const deleteDetection = async (id) => {
   const res = await detectionsCol.deleteOne({ _id: id });
   if (!res.acknowledged)
     throw new Error("Failed to delete detection.");
+};
+
+/**
+ * Flag a Detection.
+ * @param {ObjectId} id The id of the Detection to rename
+ * @returns {Promise<Detection>} The updated Detection
+ */
+export const flagDetection = async (id) => {
+  id = requireId(id, "Detection ID");
+  if (!(await getDetection(id)))
+    throw new StatusError(404, "Detection does not exist.");
+
+  const detectionsCol = await detections();
+  const detectionRes = await detectionsCol.updateOne(
+    { _id: id },
+    { $set: { flagged: true } }
+  );
+  if (!detectionRes.acknowledged)
+    throw new Error("Failed to flag detection.")
+
+  return await getDetection(id);
 };
 
 /**

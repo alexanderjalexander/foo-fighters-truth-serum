@@ -4,7 +4,6 @@ import { getUserById } from "../data/users.js";
 import { checkAuth, sync } from "./middleware.js";
 import multer from "multer";
 import { createDetection, runDetection } from "../data/detections.js";
-// import { exec, execSync } from "child_process";
 
 const router = Router();
 
@@ -28,7 +27,8 @@ router.get('/:personId/detections', checkAuth, sync(async(req, res) => {
 router.post('/:personId/detections', multer().single('file'), checkAuth, sync(async(req, res) => {
   const file = req.file;
   if (!file) return res.status(400).json({ error: "Must provide a file." });
-  const detectionName = req.body.name || `New Detection ${new Date().toString()}`;
+  const now = new Date();
+  const detectionName = req.body.name || `New Detection (${now.toDateString()} ${now.toTimeString()})`;
   
   const output = await runDetection(file);
   await createDetection(req.session.user._id, req.params.personId, detectionName, file, output);

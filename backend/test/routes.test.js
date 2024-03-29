@@ -2,6 +2,8 @@ import "dotenv/config";
 import { expect, test } from "@jest/globals";
 import supertest from "supertest";
 import { server, closeServer } from "../app";
+import { createDetection } from "../data/detections";
+import { users } from "../config/mongo";
 
 const agent = supertest.agent(server);
 
@@ -97,4 +99,23 @@ test("GET /api/people/:personId/detections", async () => {
   const res = await agent.get(`/api/people/${guyId}/detections`)
     .expect(200);
   expect(res.body.length).toBe(0);
+});
+
+let detectionId;
+
+test("POST /api/detections/:detectionId/name", async () => {
+  const user = await (await users()).findOne({ email: "auth@example.com" });
+  const detection = await createDetection(user._id, guyId, "Flagged Sample", "", true);
+  detectionId = detection._id.toString();
+  await agent.post(`/api/detections/${detectionId}/name`)
+    .set('Content-Type', 'application/json')
+    .send(JSON.stringify({
+      name: 'Flagged Sample Renamed'
+    }))
+    .expect(200);
+});
+
+test("POST /api/detections/:detectionId/flag", async () => {
+  await agent.post(`/api/detections/${detectionId}/flag`)
+    .expect(200);
 });

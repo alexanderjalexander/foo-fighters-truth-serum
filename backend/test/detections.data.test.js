@@ -2,7 +2,7 @@ import "dotenv/config";
 import { expect, test, afterAll, beforeAll, beforeEach } from '@jest/globals';
 import { closeConnection, detections, users } from '../config/mongo.js';
 import { ObjectId } from "mongodb";
-import { createDetection, deleteDetection, renameDetection } from "../data/detections.js";
+import { createDetection, deleteDetection, flagDetection, renameDetection } from "../data/detections.js";
 import { getUserById } from "../data/users.js";
 import { StatusError } from "../validation.js";
 
@@ -121,4 +121,21 @@ test('deleteDetection: Cannot delete non-existant detection', async () => {
 
 test('deleteDetection: Can delete existing detection', async () => {
   await expect(deleteDetection(_id)).resolves.toBeUndefined();
+});
+
+test('flagDetection: Cannot flag non-existant detection', async () => {
+  await expect(flagDetection(
+    "100000000000000000000000"
+  )).rejects.toEqual(
+    new StatusError(404, "Detection does not exist.")
+  );
+});
+
+test('flagDetection: Can flag detection', async () => {
+  await expect(flagDetection(_id)).resolves.toMatchObject(
+    {
+      _id,
+      flagged: true
+    }
+  );
 });

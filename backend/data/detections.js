@@ -13,6 +13,7 @@ if (process.env.NODE_ENV !== 'test')
  * @property {ObjectId} _id The ObjectID for this Detection
  * @property {ObjectId} owner The ID of the User owner of this Detection
  * @property {string} name The name of this Detection
+ * @property {string} comment The comment on this Detection
  * @property {boolean} truth If this Detection is truthful
  * @property {boolean} flagged If this Detection is wrong
  * @property {any} data The data stored in this Detection 
@@ -140,6 +141,31 @@ export const flagDetection = async (id) => {
   );
   if (!detectionRes.acknowledged)
     throw new Error("Failed to flag detection.")
+
+  return await getDetection(id);
+};
+
+/**
+ * Update the comment on a Detection.
+ * @param {ObjectId} id The id of the Detection to comment on
+ * @param {string} comment The text to update the comment to
+ * @returns {Promise<Detection>} The updated Detection
+ */
+export const updateDetectionComment = async (id, comment) => {
+  id = requireId(id, "Detection ID");
+  if (typeof comment !== 'string')
+    throw new StatusError(400, 'Comment must be a string.');
+  comment = comment.trim();
+  if (!(await getDetection(id)))
+    throw new StatusError(404, "Detection does not exist.");
+
+  const detectionsCol = await detections();
+  const detectionRes = await detectionsCol.updateOne(
+    { _id: id },
+    { $set: { comment: comment } }
+  );
+  if (!detectionRes.acknowledged)
+    throw new Error("Failed to update detection's comment.")
 
   return await getDetection(id);
 };

@@ -119,3 +119,12 @@ test("POST /api/detections/:detectionId/flag", async () => {
   await agent.post(`/api/detections/${detectionId}/flag`)
     .expect(200);
 });
+
+test("POST /api/detections/:detectionId/flag", async () => {
+  await agent.post(`/api/detections/${detectionId}/comment`)
+    .set('Content-Type', 'application/json')
+    .send(JSON.stringify({
+      comment: 'This is a sample comment.'
+    }))
+    .expect(200);
+});

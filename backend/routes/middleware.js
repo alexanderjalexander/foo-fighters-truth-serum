@@ -1,4 +1,4 @@
-import { getDetection } from "../data/detections";
+import { getDetection } from "../data/detections.js";
 
 export const sync = f => (req, res, next) => f(req, res, next).catch(next);
 

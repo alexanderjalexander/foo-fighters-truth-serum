@@ -244,6 +244,15 @@ describe('Chrome', () => {
         let truth_result = await driver.findElement(By.id('TruthTest Result')).getText();
         expect(truth_result).toBe('TRUTH');
 
+        // Editing Detection Name and Comment
+        await driver.findElement(By.id('LieTest Edit')).click();
+        await driver.wait(until.elementLocated(By.id('inputEditDetectionName')));
+        await driver.findElement(By.id('inputEditDetectionName')).clear();
+        await driver.findElement(By.id('inputEditDetectionName')).sendKeys('LieTestEdit');
+        await driver.findElement(By.id('inputEditDetectionComment')).sendKeys('LieTestComment')
+        await driver.findElement(By.id('editDetectionSubmit')).click();
+        await driver.wait(until.elementLocated(By.id('LieTestEdit')));
+
         // Quitting Selenium Driver
         await driver.quit();
     })
@@ -497,6 +506,15 @@ describe('Firefox', () => {
         await driver.wait(until.elementLocated(By.id('TruthTest Result')));
         let truth_result = await driver.findElement(By.id('TruthTest Result')).getText();
         expect(truth_result).toBe('TRUTH');
+
+        // Editing Detection Name and Comment
+        await driver.findElement(By.id('LieTest Edit')).click();
+        await driver.wait(until.elementLocated(By.id('inputEditDetectionName')));
+        await driver.findElement(By.id('inputEditDetectionName')).clear();
+        await driver.findElement(By.id('inputEditDetectionName')).sendKeys('LieTestEdit');
+        await driver.findElement(By.id('inputEditDetectionComment')).sendKeys('LieTestComment')
+        await driver.findElement(By.id('editDetectionSubmit')).click();
+        await driver.wait(until.elementLocated(By.id('LieTestEdit')));
 
         // Quitting Selenium Driver
         await driver.quit();

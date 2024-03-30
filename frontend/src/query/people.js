@@ -38,7 +38,7 @@ export const useGetAllDetectionsQuery = (id) => useBetterQuery(
     }
 );
 
-export const usePostDetectionMutation = () => useMutation({
+export const usePostAddDetectionMutation = () => useMutation({
     mutationFn: async ({json, id, form}) => {
         try {
             const res = await fetch(`/api/people/${id}/detections`, {

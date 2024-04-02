@@ -36,11 +36,12 @@ export const getDetection = async (id) => {
  * @param {ObjectId} userId The User that manage the Person
  * @param {ObjectId} personId The Person to add the Detection to
  * @param {string} name The name for the Detection
- * @param {boolean} truth If the data represents a truth
  * @param {any} data The data to upload
+ * @param {boolean} truth If the data represents a truth
+ * @param {number} confidence The confidence in the prediction
  * @returns {Promise<Detection>} The created Detection
  */
-export const createDetection = async (userId, personId, name, data, truth) => {
+export const createDetection = async (userId, personId, name, data, truth, confidence) => {
   userId = requireId(userId, "User ID");
   personId = requireId(personId, "Person ID");
   name = requireString(name, "Detection name");
@@ -53,6 +54,7 @@ export const createDetection = async (userId, personId, name, data, truth) => {
     owner: userId,
     name,
     truth,
+    confidence,
     flagged: false,
     data
   };
@@ -178,5 +180,5 @@ export const runDetection = async (file) => {
   const data = file.buffer.toString().split(',').map(v=>+v);
   const prediction = model.predict(tf.tensor3d([[data]]));
   const result = await prediction.data();
-  return result[1] > result[0];
+  return [result[1] > result[0], Math.max(result[0], result[1])];
 }

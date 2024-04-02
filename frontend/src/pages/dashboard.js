@@ -85,25 +85,29 @@ const Dashboard = ({loginHandler}) => {
 
     return (
         <div>
-            <div className="p-2 d-flex flex-row border border-top-0 border-start-0 border-end-0 border-3 justify-content-between">
-                <header id='dashboardHeader' className="fs-3">Dashboard</header>
-                <input type="button"
-                       className="btn btn-primary"
-                       onClick={ loginHandler }
-                       value="Log Out"
-                />
+            <div className="p-2 border border-top-0 border-start-0 border-end-0 border-3 ">
+                <div className='container-fluid d-flex flex-row justify-content-between'>
+                    <header id='dashboardHeader' className="fs-3">Dashboard</header>
+                    <input type="button"
+                           className="btn btn-primary"
+                           onClick={loginHandler}
+                           value="Log Out"
+                    />
+                </div>
             </div>
-            <div className='w-75 mx-auto py-2 d-flex flex-row justify-content-between'>
-                <header id='peopleHeader' className="fs-1">People</header>
-                <button id='addPersonButton'
-                        type="button"
-                        className="btn btn-lg btn-primary"
-                        onClick={ShowModal}>
-                    Add
-                </button>
-            </div>
-            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
-                {people}
+            <div className='container-fluid'>
+                <div className='w-75 mx-auto py-2 d-flex flex-row justify-content-between'>
+                    <header id='peopleHeader' className="fs-1">People</header>
+                    <button id='addPersonButton'
+                            type="button"
+                            className="btn btn-lg btn-primary"
+                            onClick={ShowModal}>
+                        Add
+                    </button>
+                </div>
+                <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
+                    {people}
+                </div>
             </div>
             <Modal id='addPersonModal' show={modalShow} onHide={HideModal} backdrop="static">
                 <Form onSubmit={onAddPerson}>

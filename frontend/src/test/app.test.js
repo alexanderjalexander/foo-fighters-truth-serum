@@ -11,6 +11,7 @@ beforeAll(async () => {
 jest.setTimeout(15000);
 
 const browsers = [Browser.CHROME, Browser.FIREFOX]
+// Known Linux Fedora Issue: Tests fail on Firefox
 
 describe('App Render Testing', () => {
     test.each(browsers)('Renders Home Title', async (browser) => {
@@ -251,6 +252,8 @@ describe('App Functionality Testing', () => {
         await driver.findElement(By.id('TruthTest Confidence'));
 
         // Editing Detection Name and Comment
+        await driver.findElement(By.id('LieTest')).click();
+        await driver.wait(until.elementLocated(By.id('LieTest Edit')));
         await driver.findElement(By.id('LieTest Edit')).click();
         await driver.wait(until.elementLocated(By.id('inputEditDetectionName')));
         await driver.findElement(By.id('inputEditDetectionName')).clear();

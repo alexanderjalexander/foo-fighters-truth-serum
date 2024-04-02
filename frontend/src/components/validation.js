@@ -27,3 +27,7 @@ export const checkPassword = (value) => {
         return ("Password must have at least 1 non alphanumeric character.");
     return "";
 };
+
+export const roundNumber = (value) => {
+
+}

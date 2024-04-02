@@ -15,6 +15,7 @@ if (process.env.NODE_ENV !== 'test')
  * @property {string} name The name of this Detection
  * @property {string} comment The comment on this Detection
  * @property {boolean} truth If this Detection is truthful
+ * @param {number} confidence The confidence in the prediction
  * @property {boolean} flagged If this Detection is wrong
  * @property {any} data The data stored in this Detection 
  */
@@ -54,6 +55,7 @@ export const createDetection = async (userId, personId, name, data, truth, confi
     owner: userId,
     name,
     truth,
+    comment: '',
     confidence,
     flagged: false,
     data

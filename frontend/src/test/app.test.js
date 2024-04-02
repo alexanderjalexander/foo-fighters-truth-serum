@@ -234,6 +234,7 @@ describe('App Functionality Testing', () => {
         await driver.wait(until.elementLocated(By.id('LieTest Result')));
         let lie_result = await driver.findElement(By.id('LieTest Result')).getText();
         expect(lie_result).toBe('LIE');
+        await driver.findElement(By.id('LieTest Confidence'));
 
         // Testing Truth Input
         const detection_truth = path.resolve('./src/test/test_detection_truth.csv');
@@ -247,6 +248,7 @@ describe('App Functionality Testing', () => {
         await driver.wait(until.elementLocated(By.id('TruthTest Result')));
         let truth_result = await driver.findElement(By.id('TruthTest Result')).getText();
         expect(truth_result).toBe('TRUTH');
+        await driver.findElement(By.id('TruthTest Confidence'));
 
         // Editing Detection Name and Comment
         await driver.findElement(By.id('LieTest Edit')).click();
@@ -255,7 +257,9 @@ describe('App Functionality Testing', () => {
         await driver.findElement(By.id('inputEditDetectionName')).sendKeys('LieTestEdit');
         await driver.findElement(By.id('inputEditDetectionComment')).sendKeys('LieTestComment')
         await driver.findElement(By.id('editDetectionSubmit')).click();
-        await driver.wait(until.elementLocated(By.id('LieTestEdit')));
+        await driver.wait(until.elementLocated(By.id('LieTestEdit Comment')))
+        let comment = await driver.findElement(By.id('LieTestEdit Comment')).getText();
+        expect(comment).toBe('Comment: LieTestComment');
 
         // Quitting Selenium Driver
         await driver.quit();

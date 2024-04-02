@@ -163,15 +163,22 @@ const Person = () => {
         detections = (
             <ListGroup className='w-100'>
                 {detectionsQuery.data.map((detection) => (
-                    <ListGroup.Item className='text-start'
-                                    key={detection._id}>
+                    <ListGroup.Item className='text-start' key={detection._id}>
                         <div className='d-flex flex-row justify-content-between'>
-                            <div className='fw-bold' id={detection.name}>{detection.name}</div>
                             <div>
+                                <div className='fw-bold' id={detection.name}>{detection.name}</div>
+                                <div id={detection.name + ' Confidence'}>Confidence: {Math.round(detection.confidence * 100)}%</div>
+                                <div id={detection.name + ' Comment'}>
+                                    { (detection.comment === '')
+                                        ? ('')
+                                        : `Comment: ${detection.comment}`}
+                                </div>
+                            </div>
+                            <div className='d-flex align-items-start justify-content-center'>
                                 <Badge id={detection.name + ' Result'} className='m-1' bg={detection.truth ? "success" : "danger"}>
-                                    {detection.truth ? "TRUTH" : "LIE"}
+                                    <h5 className='m-0'>{detection.truth ? "TRUTH" : "LIE"}</h5>
                                 </Badge>
-                                <Button size='sm' variant='secondary'
+                                <Button className='m-1' size='sm' variant='secondary'
                                         id={detection.name+' Edit'}
                                         onClick={() => {setEditDetection(
                                         {...editDetection,
@@ -184,7 +191,6 @@ const Person = () => {
                                 </Button>
                             </div>
                         </div>
-                        <div>Comment: {detection.comment}</div>
                     </ListGroup.Item>
                 ))}
             </ListGroup>
@@ -193,6 +199,33 @@ const Person = () => {
 
     return (
         <div>
+            <div className="p-2 d-flex flex-row border border-top-0 border-start-0 border-end-0 border-3 justify-content-between">
+                <header id='personHeader' className="fs-3">{personName}</header>
+                <div className='d-flex flex-row'>
+                    <Button className='mx-1'
+                            variant='secondary'
+                            onClick={ back }>
+                        Back
+                    </Button>
+                    <Button className='mx-1'
+                            variant='primary'
+                            onClick={ logout }>
+                        Log Out
+                    </Button>
+                </div>
+            </div>
+            <div className='w-75 mx-auto py-2 d-flex flex-row justify-content-between'>
+                <header id='detectionsHeader' className="fs-1">Detections</header>
+                <button id='addDetectionButton'
+                        type="button"
+                        className="btn btn-lg btn-primary"
+                        onClick={ShowAddDetectionModal}>
+                    Add
+                </button>
+            </div>
+            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
+                {detections}
+            </div>
             <Modal show={editDetection.showModal} onHide={HideEditDetectionModal} backdrop="static">
                 <Form onSubmit={onEditDetection}>
                     <Modal.Header closeButton>
@@ -257,7 +290,7 @@ const Person = () => {
                             : <label id='addError' className='text-danger'>{addDetection.error}</label>}
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={HideEditDetectionModal}>
+                        <Button variant="secondary" onClick={HideAddDetectionModal}>
                             Cancel
                         </Button>
                         <Button type='submit' variant="primary" id='addDetectionSubmit'
@@ -267,33 +300,6 @@ const Person = () => {
                     </Modal.Footer>
                 </Form>
             </Modal>
-            <div className="p-2 d-flex flex-row border border-top-0 border-start-0 border-end-0 border-3 justify-content-between">
-                <header id='personHeader' className="fs-3">{personName}</header>
-                <div className='d-flex flex-row'>
-                    <Button className='mx-1'
-                            variant='secondary'
-                            onClick={ back }>
-                        Back
-                    </Button>
-                    <Button className='mx-1'
-                            variant='primary'
-                            onClick={ logout }>
-                        Log Out
-                    </Button>
-                </div>
-            </div>
-            <div className='w-75 mx-auto py-2 d-flex flex-row justify-content-between'>
-                <header id='detectionsHeader' className="fs-1">Detections</header>
-                <button id='addDetectionButton'
-                        type="button"
-                        className="btn btn-lg btn-primary"
-                        onClick={ShowAddDetectionModal}>
-                    Add
-                </button>
-            </div>
-            <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
-                {detections}
-            </div>
         </div>
     )
 }

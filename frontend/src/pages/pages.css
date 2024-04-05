@@ -2,3 +2,9 @@
     max-width: min(75vw, 540px);
     width: 100%;
 }
+
+.container-fluid {
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 1600px; /* or 950px */
+}

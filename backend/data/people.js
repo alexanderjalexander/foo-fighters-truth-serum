@@ -7,7 +7,8 @@ import { getUserById } from "./users.js";
  * @typedef Person
  * @property {ObjectId} _id The ObjectID for this Person
  * @property {string} name The name of this Person
- * @property {import("./detections.js").Detection[]} detections The detections stored on this Person 
+ * @property {ObjectId[]} sessions The sessions stored on this Person
+ * @property {ObjectId[]} detections The detections stored on this Person 
  */
 
 /**
@@ -94,6 +95,7 @@ export const createPerson = async (userId, personName) => {
   const person = {
     _id: new ObjectId(),
     name: personName,
+    sessions: [],
     detections: []
   };
 

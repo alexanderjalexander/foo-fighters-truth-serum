@@ -105,7 +105,7 @@ let detectionId;
 
 test("POST /api/detections/:detectionId/name", async () => {
   const user = await (await users()).findOne({ email: "auth@example.com" });
-  const detection = await createDetection(user._id, guyId, "Flagged Sample", "", true);
+  const detection = await createDetection(user._id, guyId, null, "Flagged Sample", "", true);
   detectionId = detection._id.toString();
   await agent.post(`/api/detections/${detectionId}/name`)
     .set('Content-Type', 'application/json')

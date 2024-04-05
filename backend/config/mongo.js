@@ -48,3 +48,4 @@ const memoCollection = (collection) => {
 
 export const users = memoCollection('users');
 export const detections = memoCollection('detections');
+export const sessions = memoCollection('sessions');

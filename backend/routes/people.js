@@ -4,6 +4,7 @@ import { getUserById } from "../data/users.js";
 import { checkAuth, sync } from "./middleware.js";
 import multer from "multer";
 import { createDetection, runDetection } from "../data/detections.js";
+import sessionsRouter from "./sessions.js";
 
 const router = Router();
 
@@ -31,8 +32,18 @@ router.post('/:personId/detections', multer().single('file'), checkAuth, sync(as
   const detectionName = req.body.name || `New Detection (${now.toDateString()} ${now.toTimeString()})`;
   
   const [truth, confidence] = await runDetection(file);
-  await createDetection(req.session.user._id, req.params.personId, detectionName, file, truth, confidence);
+  await createDetection(
+    req.session.user._id,
+    req.params.personId,
+    req.params.sessionId,
+    detectionName,
+    file,
+    truth,
+    confidence
+  );
   res.status(200).json();
 }));
+
+router.use('/:personId/sessions/', sessionsRouter);
 
 export default router;

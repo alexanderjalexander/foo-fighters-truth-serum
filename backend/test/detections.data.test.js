@@ -18,7 +18,8 @@ beforeAll(async () => {
       {
         _id,
         name: "Liar",
-        detections: [ _id ]
+        detections: [ _id ],
+        sessions: []
       }
     ]
   });
@@ -41,6 +42,7 @@ test('createDetection: Cannot create detection on invalid user', async () => {
   await expect(createDetection(
     "100000000000000000000000",
     "100000000000000000000000",
+    null,
     "Session 1",
     "dummy data"
   )).rejects.toEqual(
@@ -49,6 +51,7 @@ test('createDetection: Cannot create detection on invalid user', async () => {
   await expect(createDetection(
     _id,
     "100000000000000000000000",
+    null,
     "Session 1",
     "dummy data"
   )).rejects.toEqual(
@@ -60,6 +63,7 @@ test('createDetection: Cannot create detection with invalid name', async () => {
   await expect(createDetection(
     _id,
     _id,
+    null,
     "                ",
     "dummy data"
   )).rejects.toEqual(
@@ -71,6 +75,7 @@ test('createDetection: Can create detection with valid inputs', async () => {
   const createPromise = createDetection(
     _id,
     _id,
+    null,
     "Session 1",
     "dummy data"
   );

@@ -3,6 +3,7 @@ import { ObjectId } from "mongodb";
 import { detections, users } from "../config/mongo.js";
 import { StatusError, requireData, requireId, requireString } from "../validation.js";
 import { getPersonById } from "./people.js";
+import { getSessionById } from './sessions.js';
 
 let model;
 if (process.env.NODE_ENV !== 'test')
@@ -11,6 +12,7 @@ if (process.env.NODE_ENV !== 'test')
 /**
  * @typedef Detection
  * @property {ObjectId} _id The ObjectID for this Detection
+ * @property {ObjectId} [sessionId] The ObjectID for the associated Session with this Detection
  * @property {ObjectId} owner The ID of the User owner of this Detection
  * @property {string} name The name of this Detection
  * @property {string} comment The comment on this Detection
@@ -36,15 +38,21 @@ export const getDetection = async (id) => {
  * Create a new Detection.
  * @param {ObjectId} userId The User that manage the Person
  * @param {ObjectId} personId The Person to add the Detection to
+ * @param {ObjectId} [sessionId] The session ID to add the Detection to
  * @param {string} name The name for the Detection
  * @param {any} data The data to upload
  * @param {boolean} truth If the data represents a truth
  * @param {number} confidence The confidence in the prediction
  * @returns {Promise<Detection>} The created Detection
  */
-export const createDetection = async (userId, personId, name, data, truth, confidence) => {
+export const createDetection = async (userId, personId, sessionId, name, data, truth, confidence) => {
   userId = requireId(userId, "User ID");
   personId = requireId(personId, "Person ID");
+  if (sessionId) {
+    sessionId = requireId(sessionId, "Session ID");
+    if (!(await getSessionById(userId, personId, sessionId)))
+      throw new StatusError(404, "Session does not exist.");
+  }
   name = requireString(name, "Detection name");
   data = requireData(data);
   const person = await getPersonById(userId, personId);
@@ -52,6 +60,7 @@ export const createDetection = async (userId, personId, name, data, truth, confi
 
   const detection = {
     _id: new ObjectId(),
+    sessionId,
     owner: userId,
     name,
     truth,
@@ -172,6 +181,54 @@ export const updateDetectionComment = async (id, comment) => {
     throw new Error("Failed to update detection's comment.")
 
   return await getDetection(id);
+};
+
+/**
+ * Moves a Detection to a specific Session, or removes it a Session.
+ * @param {ObjectId} userId The User ID
+ * @param {ObjectId} detectionId The Detection ID
+ * @param {ObjectId} [sessionId] The Session ID
+ */
+export const moveToSession = async (userId, detectionId, sessionId) => {
+  userId = requireId(userId, "User ID");
+  detectionId = requireId(detectionId, "Detection ID");
+  const detection = await getDetection(detectionId);
+  if (!detection) throw new StatusError(404, "Detection does not exist.");
+  const usersCol = await users();
+  const user = await usersCol.findOne(
+    {
+      _id: userId,
+      people: {
+        $elemMatch: {
+          detections: detectionId
+        }
+      }
+    },
+    {
+      projection: {
+        "people.$": 1
+      }
+    }
+  );
+  const detectionsCol = await detections();
+  if (sessionId) {
+    sessionId = requireId(sessionId, "Session ID");
+    if (!(await getSessionById(userId, user.people[0]._id, sessionId)))
+      throw new StatusError(404, "Session does not exist.");
+    const res = await detectionsCol.updateOne(
+      { _id: detectionId },
+      { $set: { sessionId } }
+    );
+    if (!res.acknowledged)
+      throw new Error("Failed to update detection session.");
+  } else {
+    const res = await detectionsCol.updateOne(
+      { _id: detectionId },
+      { $set: { sessionId: null } }
+    );
+    if (!res.acknowledged)
+      throw new Error("Failed to update detection session.");
+  }
 };
 
 /**

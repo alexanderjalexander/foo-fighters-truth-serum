@@ -211,3 +211,32 @@ export const getAllDetections = async (userId, personId) => {
     { $project: { data: 0, owner: 0 } }
   ]).toArray();
 }
+
+/**
+ * Gets all Sessions from a Person.
+ * @param {string|ObjectId} userId The ID of the User containing the Person.
+ * @param {string|ObjectId} personId The ID of the Person with the Sessions.
+ * @returns {Promise<import("./sessions.js").Session[]>} The Sessions.
+ */
+export const getAllSessions = async (userId, personId) => {
+  userId = requireId(userId, 'User ID');
+  personId = requireId(personId, 'Person ID');
+
+  const usersCol = await users();
+  return await usersCol.aggregate([
+    { $match: { _id: userId } },
+    { $unwind: '$people' },
+    { $match: { 'people._id': personId } },
+    { $unwind: '$people.sessions' },
+    {
+      $lookup: {
+        from: 'sessions', 
+        localField: 'people.sessions', 
+        foreignField: '_id', 
+        as: 'session'
+      }
+    },
+    { $unwind: '$session' },
+    { $replaceRoot: { newRoot: '$session' } }
+  ]).toArray();
+}

@@ -128,3 +128,32 @@ test("POST /api/detections/:detectionId/flag", async () => {
     }))
     .expect(200);
 });
+
+let sessionId;
+
+test("POST /api/people/:personId/sessions", async () => {
+  const res = await agent.post(`/api/people/${guyId}/sessions`)
+    .set('Content-Type', 'application/json')
+    .send(JSON.stringify({
+      name: 'Test Session'
+    }))
+  expect(res.status).toBe(200);
+  sessionId = res.body.sessions[res.body.sessions.length - 1];
+});
+
+test("PATCH /api/detections/:detectionId", async () => {
+  await agent.patch(`/api/detections/${detectionId}`)
+    .set('Content-Type', 'application/json')
+    .send(JSON.stringify({
+      sessionId
+    }))
+    .expect(200);
+});
+
+test("GET /api/people/:personId", async () => {
+  const res = await agent.get(`/api/people/${guyId}`);
+  expect(res.status).toBe(200);
+  expect(res.body).toMatchObject({
+    name: "New Guy"
+  });
+});

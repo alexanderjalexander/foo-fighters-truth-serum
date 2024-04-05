@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createPerson, getAllDetections } from "../data/people.js";
+import { createPerson, getAllDetections, getAllSessions, getPersonById } from "../data/people.js";
 import { getUserById } from "../data/users.js";
 import { checkAuth, sync } from "./middleware.js";
 import multer from "multer";
@@ -18,6 +18,23 @@ router.get('/', checkAuth, sync(async (req, res) => {
   if (!user) throw new Error("Session user missing.");
   user.people.forEach(person => person.numDetections = person.detections.length);
   res.status(200).json(user.people);
+}));
+
+router.get('/:personId', checkAuth, sync(async (req, res) => {
+  const { name } = await getPersonById(req.session.user._id, req.params.personId);
+  const detections = await getAllDetections(req.session.user._id, req.params.personId);
+  const sessions = await getAllSessions(req.session.user._id, req.params.personId);
+  const binned = detections.reduce((bins, detection) => {
+    const sessionName = sessions.find(({ _id }) => _id.equals(detection.sessionId))?.name || 'Not In A Session';
+    if (!bins[sessionName]) bins[sessionName] = [detection];
+    else bins[sessionName].push(detection);
+    return bins;
+  }, {});
+  res.status(200).json({
+    name,
+    detections: binned,
+    sessions
+  })
 }));
 
 router.get('/:personId/detections', checkAuth, sync(async(req, res) => {

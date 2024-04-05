@@ -5,7 +5,7 @@ import { getPersonById } from "./people.js";
 
 /**
  * @typedef Session
- * @property {ObjectId} _id The ObjectID for this Detection
+ * @property {ObjectId} _id The ObjectID for this Session
  * @property {string} name The name of this Session
  */
 

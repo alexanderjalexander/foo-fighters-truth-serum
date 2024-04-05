@@ -2,7 +2,7 @@ import { Router } from "express";
 import { checkAuth, sync } from "./middleware.js";
 import { createSession, renameSession } from "../data/sessions.js";
 
-const router = Router();
+const router = Router({ mergeParams: true });
 
 router.post('/', checkAuth, sync(async (req, res) => {
   const person = await createSession(
@@ -13,7 +13,7 @@ router.post('/', checkAuth, sync(async (req, res) => {
   res.status(200).json(person);
 }));
 
-router.post('/:sessionId', checkAuth, sync(async (req, res) => {
+router.patch('/:sessionId', checkAuth, sync(async (req, res) => {
   const session = await renameSession(
     req.session.user._id,
     req.params.personId,

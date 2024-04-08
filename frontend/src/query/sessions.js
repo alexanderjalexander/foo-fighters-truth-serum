@@ -1,14 +1,12 @@
 import {useMutation} from "@tanstack/react-query";
 
-/**
- * POST /api/people/:peopleId/detections
- */
-export const usePostAddDetectionMutation = () => useMutation({
-    mutationFn: async ({json, id, form}) => {
+export const useAddSessionMutation = () => useMutation({
+    mutationFn: async ({id, name}) => {
         try {
-            const res = await fetch(`/api/people/${id}/detections`, {
+            const res = await fetch(`/api/people/${id}/sessions`, {
                 method: 'POST',
-                body: form,
+                headers: { "Content-Type": "application/json", },
+                body: JSON.stringify({name: name}),
             });
             if (!res.ok) {
                 throw {
@@ -16,8 +14,7 @@ export const usePostAddDetectionMutation = () => useMutation({
                     message: (await res.json()).error
                 }
             }
-            if (json) { return await res.json(); }
-            else { return res; }
+            return res;
         } catch (e) {
             if (e instanceof TypeError) {
                 throw { status: 500, message: "Failed to get data, please try again in a moment." };
@@ -27,16 +24,13 @@ export const usePostAddDetectionMutation = () => useMutation({
     }
 })
 
-/**
- * POST /api/detections/:detectionId
- */
-export const useEditDetection = () => useMutation({
-    mutationFn: async ({json, id, name, comment, sessionId}) => {
+export const useEditSessionMutation = () => useMutation({
+    mutationFn: async ({id, sessionId, name}) => {
         try {
-            const res = await fetch(`/api/detections/${id}`, {
+            const res = await fetch(`/api/people/${id}/sessions/${sessionId}`, {
                 method: 'PATCH',
                 headers: { "Content-Type": "application/json", },
-                body: JSON.stringify({name, comment, sessionId}),
+                body: JSON.stringify({name: name}),
             });
             if (!res.ok) {
                 throw {
@@ -44,8 +38,7 @@ export const useEditDetection = () => useMutation({
                     message: (await res.json()).error
                 }
             }
-            if (json) { return await res.json(); }
-            else { return res; }
+            return res;
         } catch (e) {
             if (e instanceof TypeError) {
                 throw { status: 500, message: "Failed to get data, please try again in a moment." };

@@ -47,12 +47,13 @@ router.post('/:personId/detections', multer().single('file'), checkAuth, sync(as
   if (!file) return res.status(400).json({ error: "Must provide a file." });
   const now = new Date();
   const detectionName = req.body.name || `New Detection (${now.toDateString()} ${now.toTimeString()})`;
-  
+  const sessionId = req.body.sessionId;
+
   const [truth, confidence] = await runDetection(file);
   await createDetection(
     req.session.user._id,
     req.params.personId,
-    req.params.sessionId,
+    sessionId,
     detectionName,
     file,
     truth,

@@ -1,6 +1,7 @@
 const {Browser, Builder, By, until} = require("selenium-webdriver");
 const path = require("path");
 import {expect, jest, test} from '@jest/globals';
+import {Select} from "selenium-webdriver";
 
 let driver;
 
@@ -232,7 +233,10 @@ describe('App Functionality Testing', () => {
         await driver.findElement(By.id('inputDetectionFile')).sendKeys(detection_lie);
         await driver.findElement(By.id('addDetectionSubmit')).click();
 
+        await driver.findElement(By.id('Not In A Session')).click();
         await driver.wait(until.elementLocated(By.id('LieTest Result')));
+        let lie_elem = await driver.findElement(By.id('LieTest Result'));
+        await driver.wait(until.elementIsVisible(lie_elem));
         let lie_result = await driver.findElement(By.id('LieTest Result')).getText();
         expect(lie_result).toBe('LIE');
         await driver.findElement(By.id('LieTest Confidence'));
@@ -263,6 +267,99 @@ describe('App Functionality Testing', () => {
         await driver.wait(until.elementLocated(By.id('LieTestEdit Comment')))
         let comment = await driver.findElement(By.id('LieTestEdit Comment')).getText();
         expect(comment).toBe('Comment: LieTestComment');
+
+        // Quitting Selenium Driver
+        await driver.quit();
+    });
+
+    test.each(browsers)('Person Adding Sessions', async (browser) => {
+        // Initializing Drivers for Selenium
+        driver = await new Builder().forBrowser(browser).build();
+        await driver.manage().deleteCookie('sessionCookie')
+        await driver.get('http://localhost:3000/register');
+        await driver.manage().setTimeouts({implicit: 500});
+
+        // Define the Testing Email and Password
+        const crypto = require("crypto");
+        const id = crypto.randomBytes(4).toString('hex');
+        const test_email = 'test' + id + '@gmail.com';
+        const test_password = 'Stevens42!';
+
+        // Registration Test Code
+        await driver.findElement(By.id('inputEmail')).sendKeys(test_email)
+        await driver.findElement(By.id('inputPassword')).sendKeys(test_password)
+        await driver.findElement(By.id('registerButton')).click();
+        await driver.wait(until.elementLocated(By.id('loginHeader')));
+
+        // Login Test Code
+        await driver.findElement(By.id('inputEmail')).sendKeys(test_email)
+        await driver.findElement(By.id('inputPassword')).sendKeys(test_password)
+        await driver.findElement(By.id('loginButton')).click();
+        await driver.wait(until.elementLocated(By.id('dashboardHeader')));
+        await driver.wait(until.elementLocated(By.id('peopleHeader')));
+
+        // Inputting User1 Person
+        await driver.wait(until.elementLocated(By.id('addPersonButton')));
+        await driver.findElement(By.id('addPersonButton')).click();
+        await driver.wait(until.elementLocated(By.id('inputPersonName')));
+        await driver.findElement(By.id('inputPersonName')).sendKeys('User1');
+        await driver.wait(until.elementLocated(By.id('addPersonSubmit')));
+        await driver.findElement(By.id('addPersonSubmit')).click();
+
+        // Wait Until User Appears
+        await driver.wait(until.elementLocated(By.id('User1')));
+        await driver.findElement(By.id('User1')).click();
+
+        // Checking We're In Detection Page
+        await driver.wait(until.elementLocated(By.id('personHeader')));
+
+        // Testing Session Input
+        await driver.findElement(By.id('addSessionButton')).click();
+        await driver.wait(until.elementLocated(By.id('inputSessionName')));
+        await driver.findElement(By.id('inputSessionName')).sendKeys('Session1');
+        await driver.findElement(By.id('addSessionSubmit')).click();
+        await driver.findElement(By.id('Session1')).click();
+
+        // Testing Lie Input
+        const detection_lie = path.resolve('./src/test/test_detection_lie.csv');
+
+        await driver.findElement(By.id('addDetectionButton')).click();
+        await driver.wait(until.elementLocated(By.id('inputDetectionName')));
+        await driver.findElement(By.id('inputDetectionName')).sendKeys('LieTest');
+        await driver.findElement(By.id('inputDetectionFile')).sendKeys(detection_lie);
+        await driver.findElement(By.id('addDetectionSubmit')).click();
+        await driver.findElement(By.id('Not In A Session')).click();
+        await driver.wait(until.elementLocated(By.id('LieTest Result')));
+
+        // Editing Detection To Have a New Session
+        await driver.findElement(By.id('LieTest')).click();
+        await driver.wait(until.elementLocated(By.id('LieTest Edit')));
+        await driver.findElement(By.id('LieTest Edit')).click();
+        await driver.wait(until.elementLocated(By.id('inputEditDetectionName')));
+        await driver.findElement(By.id('inputEditDetectionName')).clear();
+        await driver.findElement(By.id('inputEditDetectionName')).sendKeys('LieTestEdit');
+        await driver.findElement(By.id('inputEditDetectionComment')).sendKeys('LieTestComment')
+        let select = await new Select(await driver.findElement(By.id('inputEditDetectionSession')));
+        await select.selectByVisibleText('Session1');
+        await driver.findElement(By.id('editDetectionSubmit')).click();
+
+        await driver.findElement(By.id('LieTestEdit')).click();
+        await driver.wait(until.elementLocated(By.id('LieTestEdit Comment')));
+        let commentElem = await driver.findElement(By.id('LieTestEdit Comment'));
+        await driver.wait(until.elementIsVisible(commentElem), 2000);
+        expect(await commentElem.getText()).toBe('Comment: LieTestComment');
+
+        // Adding New Detection To Session
+        const detection_lie_2 = path.resolve('./src/test/test_detection_lie.csv');
+        await driver.findElement(By.id('addDetectionButton')).click();
+        await driver.wait(until.elementLocated(By.id('inputDetectionName')));
+        await driver.findElement(By.id('inputDetectionName')).sendKeys('LieTest2');
+        await driver.findElement(By.id('inputDetectionFile')).sendKeys(detection_lie_2);
+        select = await new Select(await driver.findElement(By.id('inputDetectionSession')));
+        await select.selectByVisibleText('Session1');
+        await driver.findElement(By.id('addDetectionSubmit')).click();
+
+        await driver.wait(until.elementLocated(By.id('LieTest2')), 2000);
 
         // Quitting Selenium Driver
         await driver.quit();

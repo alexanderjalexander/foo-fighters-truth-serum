@@ -256,10 +256,10 @@ const Person = () => {
             </div>
         );
     }
-    else if (personDataQuery.data.length === 0) {
+    else if (Object.keys(personDataQuery.data.detections).length === 0) {
         personName = personDataQuery.data.name;
         detections = (
-            <p>No detections yet! Add a detection or a session with the 'Add' button at the top.</p>
+            <p>No sessions/detections yet! Add a detection or a session with the 'Add' button at the top.</p>
         );
     }
     else {

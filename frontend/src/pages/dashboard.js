@@ -109,7 +109,7 @@ const Dashboard = ({loginHandler}) => {
                     {people}
                 </div>
             </div>
-            <Modal id='addPersonModal' show={modalShow} onHide={HideModal} backdrop="static">
+            {modalShow && <Modal id='addPersonModal' show={modalShow} onHide={HideModal} backdrop="static">
                 <Form onSubmit={onAddPerson}>
                     <Modal.Header closeButton>
                         <Modal.Title>Add New Person</Modal.Title>
@@ -125,7 +125,8 @@ const Dashboard = ({loginHandler}) => {
                             />
                         </Form.Group>
                         <div>
-                            {addError === '' ? <div></div> : <label id='addError' className='text-danger'>{addError}</label>}
+                            {addError === '' ? <div></div> :
+                                <label id='addError' className='text-danger'>{addError}</label>}
                         </div>
                     </Modal.Body>
                     <Modal.Footer>
@@ -141,7 +142,7 @@ const Dashboard = ({loginHandler}) => {
                         </Button>
                     </Modal.Footer>
                 </Form>
-            </Modal>
+            </Modal>}
         </div>
     )
 }

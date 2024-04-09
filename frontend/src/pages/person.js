@@ -307,7 +307,7 @@ const Person = () => {
                     {detections}
                 </div>
             </div>
-            <Modal show={editDetection.showModal} onHide={HideEditDetectionModal} backdrop="static">
+            {editDetection.showModal && <Modal show={editDetection.showModal} onHide={HideEditDetectionModal} backdrop="static">
                 <Form onSubmit={onEditDetection}>
                     <Modal.Header closeButton>
                         <Modal.Title>Edit Detection: {editDetection.name}</Modal.Title>
@@ -324,7 +324,8 @@ const Person = () => {
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Detection Comment</Form.Label>
-                            <Form.Control aria-label='Detection Comment Box' name="comment" id='inputEditDetectionComment'
+                            <Form.Control aria-label='Detection Comment Box' name="comment"
+                                          id='inputEditDetectionComment'
                                           value={editDetection.comment}
                                           onChange={e =>
                                               setEditDetection({...editDetection, error: '', comment: e.target.value})}
@@ -334,7 +335,10 @@ const Person = () => {
                         <Form.Group>
                             <Form.Label>Detection Session</Form.Label>
                             <Form.Select name="select" id="inputEditDetectionSession"
-                                         value={editDetection.sessionId} onChange={e => setEditDetection({...editDetection, sessionId: e.target.value})}>
+                                         value={editDetection.sessionId} onChange={e => setEditDetection({
+                                ...editDetection,
+                                sessionId: e.target.value
+                            })}>
                                 <option value={null}>None</option>
                                 {sessions === undefined
                                     ? null
@@ -348,7 +352,8 @@ const Person = () => {
                             : <label id='editError' className='text-danger'>{editDetection.error}</label>}
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={() => setEditDetection({...editDetection, showModal: false})}>
+                        <Button variant="secondary"
+                                onClick={() => setEditDetection({...editDetection, showModal: false})}>
                             Cancel
                         </Button>
                         <Button type='submit' variant="primary" id='editDetectionSubmit'
@@ -357,8 +362,8 @@ const Person = () => {
                         </Button>
                     </Modal.Footer>
                 </Form>
-            </Modal>
-            <Modal show={addDetection.showModal} onHide={HideAddDetectionModal} backdrop="static">
+            </Modal>}
+            {addDetection.showModal && <Modal show={addDetection.showModal} onHide={HideAddDetectionModal} backdrop="static">
                 <Form onSubmit={onAddDetection}>
                     <Modal.Header closeButton>
                         <Modal.Title>Add New Detection</Modal.Title>
@@ -368,7 +373,11 @@ const Person = () => {
                             <Form.Label>Detection Name</Form.Label>
                             <Form.Control aria-label='Detection Name Box' name="name" id='inputDetectionName'
                                           value={addDetection.name}
-                                          onChange={e => setAddDetection({...addDetection, error: '', name: e.target.value})}
+                                          onChange={e => setAddDetection({
+                                              ...addDetection,
+                                              error: '',
+                                              name: e.target.value
+                                          })}
                                           placeholder='Enter Detection Name Here'
                             />
                         </Form.Group>
@@ -376,12 +385,13 @@ const Person = () => {
                             <Form.Label>Detection File</Form.Label>
                             <Form.Control type="file" name="file" aria-label='Detection File Upload'
                                           id='inputDetectionFile' accept=".csv"
-                                          placeholder='Place Detections .csv Here' />
+                                          placeholder='Place Detections .csv Here'/>
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Detection Session</Form.Label>
                             <Form.Select name="sessionId" id="inputDetectionSession"
-                                         value={addDetection.sessionId} onChange={e => setAddDetection({...addDetection, sessionId: e.target.value})}>
+                                         value={addDetection.sessionId}
+                                         onChange={e => setAddDetection({...addDetection, sessionId: e.target.value})}>
                                 <option value="">None</option>
                                 {sessions === undefined
                                     ? null
@@ -404,8 +414,8 @@ const Person = () => {
                         </Button>
                     </Modal.Footer>
                 </Form>
-            </Modal>
-            <Modal show={editSession.showModal} onHide={HideEditSessionModal} backdrop="static">
+            </Modal>}
+            {editSession.showModal && <Modal show={editSession.showModal} onHide={HideEditSessionModal} backdrop="static">
                 <Form onSubmit={onEditSession}>
                     <Modal.Header closeButton><Modal.Title>Edit Session: {editSession.name}</Modal.Title></Modal.Header>
                     <Modal.Body>
@@ -413,7 +423,11 @@ const Person = () => {
                             <Form.Label>Session Name</Form.Label>
                             <Form.Control aria-label='Session Name Box' name="name" id='inputEditSessionName'
                                           value={editSession.name}
-                                          onChange={e => setEditSession({...editSession, error: '', name: e.target.value})}
+                                          onChange={e => setEditSession({
+                                              ...editSession,
+                                              error: '',
+                                              name: e.target.value
+                                          })}
                                           placeholder='Enter Session Name Here'
                             />
                         </Form.Group>
@@ -431,8 +445,8 @@ const Person = () => {
                         </Button>
                     </Modal.Footer>
                 </Form>
-            </Modal>
-            <Modal show={addSession.showModal} onHide={HideAddSessionModal} backdrop="static">
+            </Modal>}
+            {addSession.showModal && <Modal show={addSession.showModal} onHide={HideAddSessionModal} backdrop="static">
                 <Form onSubmit={onAddSession}>
                     <Modal.Header closeButton><Modal.Title>Add New Session</Modal.Title></Modal.Header>
                     <Modal.Body>
@@ -440,7 +454,11 @@ const Person = () => {
                             <Form.Label>Session Name</Form.Label>
                             <Form.Control aria-label='Session Name Box' name="name" id='inputSessionName'
                                           value={addSession.name}
-                                          onChange={e => setAddSession({...addSession, error: '', name: e.target.value})}
+                                          onChange={e => setAddSession({
+                                              ...addSession,
+                                              error: '',
+                                              name: e.target.value
+                                          })}
                                           placeholder='Enter Session Name Here'
                             />
                         </Form.Group>
@@ -458,7 +476,7 @@ const Person = () => {
                         </Button>
                     </Modal.Footer>
                 </Form>
-            </Modal>
+            </Modal>}
         </div>
     )
 }

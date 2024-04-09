@@ -364,4 +364,67 @@ describe('App Functionality Testing', () => {
         // Quitting Selenium Driver
         await driver.quit();
     })
+
+    test.each(browsers)('Person Flagging Detections', async (browser) => {
+        // Initializing Drivers for Selenium
+        driver = await new Builder().forBrowser(browser).build();
+        await driver.manage().deleteCookie('sessionCookie')
+        await driver.get('http://localhost:3000/register');
+        await driver.manage().setTimeouts({implicit: 500});
+
+        // Define the Testing Email and Password
+        const crypto = require("crypto");
+        const id = crypto.randomBytes(4).toString('hex');
+        const test_email = 'test' + id + '@gmail.com';
+        const test_password = 'Stevens42!';
+
+        // Registration Test Code
+        await driver.findElement(By.id('inputEmail')).sendKeys(test_email)
+        await driver.findElement(By.id('inputPassword')).sendKeys(test_password)
+        await driver.findElement(By.id('registerButton')).click();
+        await driver.wait(until.elementLocated(By.id('loginHeader')));
+
+        // Login Test Code
+        await driver.findElement(By.id('inputEmail')).sendKeys(test_email)
+        await driver.findElement(By.id('inputPassword')).sendKeys(test_password)
+        await driver.findElement(By.id('loginButton')).click();
+        await driver.wait(until.elementLocated(By.id('dashboardHeader')));
+        await driver.wait(until.elementLocated(By.id('peopleHeader')));
+
+        // Inputting User1 Person
+        await driver.wait(until.elementLocated(By.id('addPersonButton')));
+        await driver.findElement(By.id('addPersonButton')).click();
+        await driver.wait(until.elementLocated(By.id('inputPersonName')));
+        await driver.findElement(By.id('inputPersonName')).sendKeys('User1');
+        await driver.wait(until.elementLocated(By.id('addPersonSubmit')));
+        await driver.findElement(By.id('addPersonSubmit')).click();
+
+        // Wait Until User Appears
+        await driver.wait(until.elementLocated(By.id('User1')));
+        await driver.findElement(By.id('User1')).click();
+
+        // Checking We're In Detection Page
+        await driver.wait(until.elementLocated(By.id('personHeader')));
+
+        // Testing Lie Input
+        const detection_lie = path.resolve('./src/test/test_detection_lie.csv');
+        await driver.findElement(By.id('addDetectionButton')).click();
+        await driver.wait(until.elementLocated(By.id('inputDetectionName')));
+        await driver.findElement(By.id('inputDetectionName')).sendKeys('LieTest');
+        await driver.findElement(By.id('inputDetectionFile')).sendKeys(detection_lie);
+        await driver.findElement(By.id('addDetectionSubmit')).click();
+        await driver.findElement(By.id('Not In A Session')).click();
+        await driver.wait(until.elementLocated(By.id('LieTest')));
+        await driver.findElement(By.id('LieTest')).click();
+
+        await driver.wait(until.elementLocated(By.id('LieTest Flag')));
+        await driver.findElement(By.id('LieTest Flag')).click();
+        await driver.wait(until.elementLocated(By.id('flagDetectionSubmit')));
+        await driver.findElement(By.id('flagDetectionSubmit')).click();
+
+        await driver.wait(until.elementLocated(By.id('LieTest Flagged')));
+
+        // Quitting Selenium Driver
+        await driver.quit();
+    })
 })

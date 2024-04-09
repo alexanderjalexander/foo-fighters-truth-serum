@@ -54,3 +54,26 @@ export const useEditDetection = () => useMutation({
         }
     }
 })
+
+export const useFlagDetection = () => useMutation({
+    mutationFn: async ({id}) => {
+        try {
+            const res = await fetch(`/api/detections/${id}/flag`, {
+                method: 'POST',
+                headers: { "Content-Type": "application/json", }
+            });
+            if (!res.ok) {
+                throw {
+                    status: res.status,
+                    message: (await res.json()).error
+                }
+            }
+            return res;
+        } catch (e) {
+            if (e instanceof TypeError) {
+                throw { status: 500, message: "Failed to get data, please try again in a moment." };
+            }
+            throw e;
+        }
+    }
+})

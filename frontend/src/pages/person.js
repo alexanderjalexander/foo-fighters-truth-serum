@@ -1,14 +1,13 @@
 import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-import {Accordion, AccordionBody, Badge, Button, Form, Modal, Spinner} from "react-bootstrap";
+import {Accordion, AccordionBody, Badge, Button, Form, Modal, OverlayTrigger, Spinner, Tooltip} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPenToSquare} from "@fortawesome/free-solid-svg-icons";
+import {faFlag, faPenToSquare} from "@fortawesome/free-solid-svg-icons";
 
 import {useUser} from "../components/UserContext";
 import {useLogoutMutation} from "../query/auth";
 import {useGetAllPersonDataQuery} from "../query/people";
-import {usePostAddDetectionMutation} from "../query/detections";
-import {useEditDetection} from "../query/detections";
+import {useFlagDetection, usePostAddDetectionMutation, useEditDetection} from "../query/detections";
 import {useAddSessionMutation, useEditSessionMutation} from "../query/sessions";
 
 const Person = () => {
@@ -52,27 +51,46 @@ const Person = () => {
     // Modal Handling for Editing Detections
     const [editDetection, setEditDetection] = useState({
         editing: false, error: '', showModal: false,
-        id: '', name: '', comment: '', sessionId: ''
+        id: '', name: '', prev_name: '', comment: '', sessionId: ''
     })
     const HideEditDetectionModal = () => setEditDetection({...editDetection, showModal: false})
     const editDetectionMutation = useEditDetection();
     const onEditDetection = async (e) => {
         e.preventDefault();
         try {
-            console.log(editDetection);
             setEditDetection({...editDetection, editing:true})
             await editDetectionMutation.mutateAsync({
                 json:false,
                 name: editDetection.name,
                 comment: editDetection.comment,
                 id: editDetection.id,
-                sessionId: (editDetection.sessionId !== '' ? editDetection.sessionId : undefined),
+                sessionId: (editDetection.sessionId),
             });
             await personDataQuery.refetch();
-            setEditDetection({id:'', name:'', comment:'', error:'', sessionId: '', editing:false, showModal:false})
+            setEditDetection({id:'', name:'', prev_name: '', comment:'', error:'', sessionId: '', editing:false, showModal:false})
         } catch (e) {
             console.error('Edit Detection Form Mutation Failed');
             setEditDetection({...editDetection, error: (e.status + ':' + e.message)});
+        }
+    }
+
+    // Modal Handling for Flagging Detections
+    const [flagDetection, setFlagDetection] = useState({
+        flagging: false, error: '', showModal: false, id: '', name: ''
+    })
+    const HideFlagDetectionModal = () => setFlagDetection({...flagDetection, showModal: false})
+    const flagDetectionMutation = useFlagDetection();
+    const onFlagDetection = async (e) => {
+        e.preventDefault();
+        try {
+            setFlagDetection({...flagDetection, error: '', flagging: true})
+            await flagDetectionMutation.mutateAsync({id:flagDetection.id})
+            await personDataQuery.refetch();
+            setFlagDetection({id: '', name: '', error: '', flagging: false, showModal: false})
+        } catch (e) {
+
+            console.error('Edit Detection Form Mutation Failed');
+            setFlagDetection({...flagDetection, error: (e.status + ':' + e.message)})
         }
     }
 
@@ -99,7 +117,7 @@ const Person = () => {
     }
 
     const [editSession, setEditSession] = useState({
-        editing: false, error: '', showModal: false, sessionId: '', name: ''
+        editing: false, error: '', showModal: false, sessionId: '', prev_name: '', name: ''
     })
     const HideEditSessionModal = () => setEditSession({...editSession, showModal: false});
     const editSessionMutation = useEditSessionMutation();
@@ -112,7 +130,7 @@ const Person = () => {
                 id: id, sessionId: editSession.sessionId, name: editSession.name
             });
             await personDataQuery.refetch();
-            setEditSession({name: '', showModal: false, sessionId: '', error: '', editing: false});
+            setEditSession({name: '', showModal: false, sessionId: '', prev_name: '', error: '', editing: false});
         } catch (e) {
             console.error('Edit Session Form Mutation Failed');
             setEditSession({...editSession, error: (e.status + ':' + e.message)});
@@ -156,10 +174,23 @@ const Person = () => {
             <Accordion.Header id={detection.name}>
                 <div className='d-flex flex-row justify-content-between w-100 align-items-center'>
                     <div className='fw-bold'>{detection.name}</div>
-                    <Badge id={detection.name + ' Result'} className='m-1'
-                           bg={detection.truth ? "success" : "danger"}>
-                        <h5 className='m-0'>{detection.truth ? "TRUTH" : "LIE"}</h5>
-                    </Badge>
+                    <div>
+                        {detection.flagged
+                            ?
+                            <OverlayTrigger overlay={<Tooltip id="button-tooltip">
+                                This detection was marked as incorrect.
+                            </Tooltip>}>
+                                <Badge id={detection.name + ' Flagged'} className='m-1' bg='danger'>
+                                    <h6 className='m-0'><FontAwesomeIcon icon={faFlag}/></h6>
+                                </Badge>
+                            </OverlayTrigger>
+                            :
+                            <div></div>}
+                        <Badge id={detection.name + ' Result'} className='m-1'
+                               bg={detection.truth ? "success" : "danger"}>
+                            <h5 className='m-0'>{detection.truth ? "TRUTH" : "LIE"}</h5>
+                        </Badge>
+                    </div>
                 </div>
             </Accordion.Header>
             <Accordion.Body className='d-flex flex-row justify-content-between'>
@@ -173,12 +204,22 @@ const Person = () => {
                     </div>
                 </div>
                 <div className='d-flex align-items-start justify-content-center'>
+                    {!detection.flagged
+                        ? <Button className='m-1' size='sm' variant='danger'
+                                  id={detection.name+' Flag'}
+                                  onClick={() => setFlagDetection({
+                                      ...flagDetection, showModal: true, id: detection._id, name: detection.name
+                                  })}>
+                        <FontAwesomeIcon icon={faFlag}/>
+                        </Button>
+                        : <div></div>}
                     <Button className='m-1' size='sm' variant='secondary'
                             id={detection.name+' Edit'}
                             onClick={() => {setEditDetection(
                                 {...editDetection,
                                     showModal: true, id: detection._id, name: detection.name,
-                                    comment:detection.comment})
+                                    sessionId: detection.sessionId,
+                                    prev_name: detection.name, comment:detection.comment})
                             }}>
                         <FontAwesomeIcon icon={faPenToSquare}/>
                     </Button>
@@ -256,7 +297,7 @@ const Person = () => {
                                                     {...editSession,
                                                         showModal: true,
                                                         sessionId: session._id,
-                                                        name:session.name})
+                                                        name:session.name, prev_name: session.name})
                                                 }}>
                                             <FontAwesomeIcon icon={faPenToSquare}/>
                                         </Button>}
@@ -307,10 +348,33 @@ const Person = () => {
                     {detections}
                 </div>
             </div>
+            {flagDetection.showModal && <Modal show={flagDetection.showModal} onHide={HideFlagDetectionModal} backdrop="static">
+                <Form onSubmit={onFlagDetection}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Flag Detection: {flagDetection.name}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div>Are you sure you want to flag this detection? Flagging this detection will irreversibly mark it as incorrect.</div>
+                        {flagDetection.error === ''
+                            ? <div></div>
+                            : <label id='flagError' className='text-danger'>{flagDetection.error}</label>}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary"
+                                onClick={() => setFlagDetection({...flagDetection, showModal: false})}>
+                            Cancel
+                        </Button>
+                        <Button type='submit' variant="danger" id='flagDetectionSubmit'
+                                disabled={flagDetection.flagging}>
+                            {flagDetection.flagging ? 'Flagging...' : 'Flag'}
+                        </Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal>}
             {editDetection.showModal && <Modal show={editDetection.showModal} onHide={HideEditDetectionModal} backdrop="static">
                 <Form onSubmit={onEditDetection}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Edit Detection: {editDetection.name}</Modal.Title>
+                        <Modal.Title>Edit Detection: {editDetection.prev_name}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form.Group>
@@ -339,7 +403,7 @@ const Person = () => {
                                 ...editDetection,
                                 sessionId: e.target.value
                             })}>
-                                <option value={null}>None</option>
+                                <option value={''}>None</option>
                                 {sessions === undefined
                                     ? null
                                     : sessions.map((session) => (
@@ -417,7 +481,7 @@ const Person = () => {
             </Modal>}
             {editSession.showModal && <Modal show={editSession.showModal} onHide={HideEditSessionModal} backdrop="static">
                 <Form onSubmit={onEditSession}>
-                    <Modal.Header closeButton><Modal.Title>Edit Session: {editSession.name}</Modal.Title></Modal.Header>
+                    <Modal.Header closeButton><Modal.Title>Edit Session: {editSession.prev_name}</Modal.Title></Modal.Header>
                     <Modal.Body>
                         <Form.Group>
                             <Form.Label>Session Name</Form.Label>
@@ -433,7 +497,7 @@ const Person = () => {
                         </Form.Group>
                         {editSession.error === ''
                             ? <div></div>
-                            : <label id='addError' className='text-danger'>{editSession.error}</label>}
+                            : <label id='editError' className='text-danger'>{editSession.error}</label>}
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={HideEditSessionModal}>

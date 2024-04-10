@@ -236,8 +236,11 @@ export const moveToSession = async (userId, detectionId, sessionId) => {
  * @param {any} file A file object straight from the web request
  */
 export const runDetection = async (file) => {
-  const data = file.buffer.toString().split(',').map(v=>+v);
-  const prediction = model.predict(tf.tensor3d([[data]]));
+  const data = file.buffer.toString().trim().split('\n').map(line =>
+    line.trim().split(',').map(v=>+v)
+  );
+  if (isNaN(data[0][0])) data.shift();
+  const prediction = model.predict(tf.tensor3d([data]));
   const result = await prediction.data();
   return [result[1] > result[0], Math.max(result[0], result[1])];
 }

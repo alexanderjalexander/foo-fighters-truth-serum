@@ -258,6 +258,7 @@ const Person = () => {
     }
     else if (Object.keys(personDataQuery.data.detections).length === 0) {
         personName = personDataQuery.data.name;
+        sessions = personDataQuery.data.sessions;
         detections = (
             <p>No sessions/detections yet! Add a detection or a session with the 'Add' button at the top.</p>
         );

@@ -256,7 +256,7 @@ const Person = () => {
             </div>
         );
     }
-    else if (Object.keys(personDataQuery.data.detections).length === 0) {
+    else if (Object.keys(personDataQuery.data.detections).length === 0 && personDataQuery.data.sessions.length === 0) {
         personName = personDataQuery.data.name;
         sessions = personDataQuery.data.sessions;
         detections = (

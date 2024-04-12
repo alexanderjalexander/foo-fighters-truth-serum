@@ -1,6 +1,6 @@
 import React, {useEffect} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-import {Accordion, AccordionBody, Badge, Button, Form, Modal, OverlayTrigger, Spinner, Tooltip} from "react-bootstrap";
+import {Accordion, AccordionBody, Badge, Button, OverlayTrigger, Spinner, Tooltip} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFlag, faPenToSquare} from "@fortawesome/free-solid-svg-icons";
 

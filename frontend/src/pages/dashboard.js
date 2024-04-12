@@ -1,6 +1,7 @@
-import React, {useState} from "react";
-import {Button, ListGroup, Form, Modal, Spinner, Badge} from "react-bootstrap";
-import {useAddPersonMutation, useGetAllPeopleQuery} from "../query/people";
+import React from "react";
+import {ListGroup, Spinner, Badge} from "react-bootstrap";
+import {useGetAllPeopleQuery} from "../query/people";
+import AddPerson from "../components/modal/addPerson";
 
 const Dashboard = ({loginHandler}) => {
     // Obtaining People Query
@@ -55,33 +56,7 @@ const Dashboard = ({loginHandler}) => {
     }
 
     // Modal States and Form Control
-    const [modalShow, setModalShow] = useState(false);
-    const [name, setName] = useState('');
-    const updateName = (newName) => {
-        setName(newName);
-        setAddError('');
-    }
-    const [addDisabled, setAddDisabled] = useState(false);
-    const [addError, setAddError] = useState('');
-    const ShowModal = () => setModalShow(true);
-    const HideModal = () => setModalShow(false);
-
-    // Add Person Form Mutation
-    const AddPersonMutation = useAddPersonMutation(name);
-    const onAddPerson = async (e) => {
-        e.preventDefault();
-        setAddDisabled(true);
-        try {
-            await AddPersonMutation.mutateAsync(undefined, undefined);
-            await refetch();
-            updateName('');
-            HideModal();
-        } catch (e) {
-            console.error('Add Person Form Mutation Failed');
-            setAddError(e.status + ':' + e.message);
-        }
-        setAddDisabled(false);
-    };
+    const addPersonComponents = AddPerson(refetch);
 
     return (
         <div>
@@ -98,51 +73,13 @@ const Dashboard = ({loginHandler}) => {
             <div className='container-fluid'>
                 <div className='w-75 mx-auto py-2 d-flex flex-row justify-content-between'>
                     <header id='peopleHeader' className="fs-1">People</header>
-                    <button id='addPersonButton'
-                            type="button"
-                            className="btn btn-lg btn-primary"
-                            onClick={ShowModal}>
-                        Add
-                    </button>
+                    {addPersonComponents.addPersonButton}
                 </div>
                 <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
                     {people}
                 </div>
             </div>
-            {modalShow && <Modal id='addPersonModal' show={modalShow} onHide={HideModal} backdrop="static">
-                <Form onSubmit={onAddPerson}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Add New Person</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Form.Group>
-                            <Form.Label>Name</Form.Label>
-                            <Form.Control aria-label='Name Box'
-                                          id='inputPersonName'
-                                          value={name}
-                                          onChange={e => updateName(e.target.value)}
-                                          placeholder='Enter Name Here'
-                            />
-                        </Form.Group>
-                        <div>
-                            {addError === '' ? <div></div> :
-                                <label id='addError' className='text-danger'>{addError}</label>}
-                        </div>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={HideModal}>
-                            Cancel
-                        </Button>
-                        <Button type='submit'
-                                variant="primary"
-                                id='addPersonSubmit'
-                                disabled={addDisabled || isError || isPending}
-                                onClick={onAddPerson}>
-                            {addDisabled ? 'Adding...' : 'Add'}
-                        </Button>
-                    </Modal.Footer>
-                </Form>
-            </Modal>}
+            {addPersonComponents.addPersonModal}
         </div>
     )
 }

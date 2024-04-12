@@ -1,7 +1,6 @@
 import {Button, Form, Modal} from "react-bootstrap";
 import React, {useState} from "react";
 import {usePostAddDetectionMutation} from "../../query/detections";
-import {useGetAllPersonDataQuery} from "../../query/people";
 
 export default function AddDetection(id, personDataQuery, sessions) {
     const [addDetection, setAddDetection] = useState({

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createPerson, getAllDetections, getAllSessions, getPersonById } from "../data/people.js";
+import { createPerson, getAllDetections, getAllSessions, getPersonById, renamePerson } from "../data/people.js";
 import { getUserById } from "../data/users.js";
 import { checkAuth, sync } from "./middleware.js";
 import multer from "multer";
@@ -60,6 +60,11 @@ router.post('/:personId/detections', multer().single('file'), checkAuth, sync(as
     confidence
   );
   res.status(200).json();
+}));
+
+router.patch('/:personId', checkAuth, sync(async(req, res) => {
+  const user = await renamePerson(req.session.user._id, req.params.personId, req.body.name);
+  res.status(200).json(user);
 }));
 
 router.use('/:personId/sessions/', sessionsRouter);

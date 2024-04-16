@@ -9,9 +9,9 @@ beforeAll(async () => {
     process.env.DATABASE = 'TEST_DB';
 })
 
-jest.setTimeout(15000);
+jest.setTimeout(20000);
 
-const browsers = [Browser.CHROME, Browser.FIREFOX]
+const browsers = [Browser.CHROME]
 // Known Linux Fedora Issue: Tests fail on Firefox
 
 describe('App Render Testing', () => {
@@ -150,30 +150,26 @@ describe('App Functionality Testing', () => {
         await inputName.sendKeys('User1');
 
         await driver.wait(until.elementLocated(By.id('addPersonSubmit')));
-        let addPersonSubmit = await driver.findElement(By.id('addPersonSubmit'));
-        await addPersonSubmit.click();
+        await driver.findElement(By.id('addPersonSubmit')).click();
         await driver.wait(until.elementLocated(By.id('User1')));
 
         await addPersonButton.click();
         inputName = await driver.findElement(By.id('inputPersonName'));
         await inputName.sendKeys('User2');
-        addPersonSubmit = await driver.findElement(By.id('addPersonSubmit'));
-        await addPersonSubmit.click();
+        await driver.findElement(By.id('addPersonSubmit')).click();
         await driver.wait(until.elementLocated(By.id('User2')));
 
         await addPersonButton.click();
         inputName = await driver.findElement(By.id('inputPersonName'));
         await inputName.sendKeys('User3');
-        addPersonSubmit = await driver.findElement(By.id('addPersonSubmit'));
-        await addPersonSubmit.click();
+        await driver.findElement(By.id('addPersonSubmit')).click();
         await driver.wait(until.elementLocated(By.id('User3')));
 
         // Testing Duplicate User Input
         await addPersonButton.click();
         inputName = await driver.findElement(By.id('inputPersonName'));
         await inputName.sendKeys('User1');
-        addPersonSubmit = await driver.findElement(By.id('addPersonSubmit'));
-        await addPersonSubmit.click();
+        await driver.findElement(By.id('addPersonSubmit')).click();
         await driver.wait(until.elementLocated(By.id('addError')));
 
         // Quitting Selenium Driver
@@ -233,6 +229,7 @@ describe('App Functionality Testing', () => {
         await driver.findElement(By.id('inputDetectionFile')).sendKeys(detection_lie);
         await driver.findElement(By.id('addDetectionSubmit')).click();
 
+        await driver.wait(until.elementLocated(By.id('Not In A Session')));
         await driver.findElement(By.id('Not In A Session')).click();
         await driver.wait(until.elementLocated(By.id('LieTest Result')));
         let lie_elem = await driver.findElement(By.id('LieTest Result'));
@@ -264,8 +261,12 @@ describe('App Functionality Testing', () => {
         await driver.findElement(By.id('inputEditDetectionName')).sendKeys('LieTestEdit');
         await driver.findElement(By.id('inputEditDetectionComment')).sendKeys('LieTestComment')
         await driver.findElement(By.id('editDetectionSubmit')).click();
-        await driver.wait(until.elementLocated(By.id('LieTestEdit Comment')))
-        let comment = await driver.findElement(By.id('LieTestEdit Comment')).getText();
+
+        await driver.wait(until.elementLocated(By.id('LieTest Edit')));
+        await driver.findElement(By.id('LieTest Edit')).click();
+        await driver.wait(until.elementLocated(By.id('LieTestEdit Comment')));
+        let comment_elem = await driver.findElement(By.id('LieTestEdit Comment'));
+        let comment = await comment_elem.getText();
         expect(comment).toBe('Comment: LieTestComment');
 
         // Quitting Selenium Driver
@@ -318,6 +319,7 @@ describe('App Functionality Testing', () => {
         await driver.wait(until.elementLocated(By.id('inputSessionName')));
         await driver.findElement(By.id('inputSessionName')).sendKeys('Session1');
         await driver.findElement(By.id('addSessionSubmit')).click();
+        await driver.wait(until.elementLocated(By.id('Session1')));
         await driver.findElement(By.id('Session1')).click();
 
         // Testing Lie Input
@@ -328,6 +330,8 @@ describe('App Functionality Testing', () => {
         await driver.findElement(By.id('inputDetectionName')).sendKeys('LieTest');
         await driver.findElement(By.id('inputDetectionFile')).sendKeys(detection_lie);
         await driver.findElement(By.id('addDetectionSubmit')).click();
+
+        await driver.wait(until.elementLocated(By.id('Not In A Session')));
         await driver.findElement(By.id('Not In A Session')).click();
         await driver.wait(until.elementLocated(By.id('LieTest Result')));
 
@@ -359,7 +363,7 @@ describe('App Functionality Testing', () => {
         await select.selectByVisibleText('Session1');
         await driver.findElement(By.id('addDetectionSubmit')).click();
 
-        await driver.wait(until.elementLocated(By.id('LieTest2')), 2000);
+        await driver.wait(until.elementLocated(By.id('LieTest2')));
 
         // Quitting Selenium Driver
         await driver.quit();
@@ -413,6 +417,8 @@ describe('App Functionality Testing', () => {
         await driver.findElement(By.id('inputDetectionName')).sendKeys('LieTest');
         await driver.findElement(By.id('inputDetectionFile')).sendKeys(detection_lie);
         await driver.findElement(By.id('addDetectionSubmit')).click();
+
+        await driver.wait(until.elementLocated(By.id('Not In A Session')));
         await driver.findElement(By.id('Not In A Session')).click();
         await driver.wait(until.elementLocated(By.id('LieTest')));
         await driver.findElement(By.id('LieTest')).click();

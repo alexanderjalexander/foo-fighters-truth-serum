@@ -66,8 +66,7 @@ export default function AddPerson(refetch) {
                         <Button type='submit'
                                 variant="primary"
                                 id='addPersonSubmit'
-                                disabled={addPerson.addDisabled}
-                                onClick={onAddPerson}>
+                                disabled={addPerson.addDisabled}>
                             {addPerson.addDisabled ? 'Adding...' : 'Add'}
                         </Button>
                     </Modal.Footer>

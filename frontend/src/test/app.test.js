@@ -1,3 +1,5 @@
+import crypto from "crypto";
+
 const {Browser, Builder, By, until} = require("selenium-webdriver");
 const path = require("path");
 import {expect, jest, test} from '@jest/globals';
@@ -115,7 +117,7 @@ describe('App Functionality Testing', () => {
         await driver.quit();
     });
 
-    test.each(browsers)('Dashboard Adding Users', async (browser) => {
+    test.each(browsers)('Dashboard Adding People', async (browser) => {
         // Initializing Drivers for Selenium
         driver = await new Builder().forBrowser(browser).build();
         await driver.manage().deleteCookie('sessionCookie')
@@ -171,6 +173,61 @@ describe('App Functionality Testing', () => {
         await inputName.sendKeys('User1');
         await driver.findElement(By.id('addPersonSubmit')).click();
         await driver.wait(until.elementLocated(By.id('addError')));
+
+        // Quitting Selenium Driver
+        await driver.quit();
+    });
+
+    test.each(browsers)('Dashboard Renaming Users', async (browser) => {
+        // Initializing Drivers for Selenium
+        driver = await new Builder().forBrowser(browser).build();
+        await driver.manage().deleteCookie('sessionCookie')
+        await driver.get('http://localhost:3000/register');
+        await driver.manage().setTimeouts({implicit: 500});
+
+        // Define the Testing Email and Password
+        const crypto = require("crypto");
+        const id = crypto.randomBytes(4).toString('hex');
+        const test_email = 'test' + id + '@gmail.com';
+        const test_password = 'Stevens42!';
+
+        // Registration Test Code
+        await driver.findElement(By.id('inputEmail')).sendKeys(test_email)
+        await driver.findElement(By.id('inputPassword')).sendKeys(test_password)
+        await driver.findElement(By.id('registerButton')).click();
+        await driver.wait(until.elementLocated(By.id('loginHeader')));
+
+        // Login Test Code
+        await driver.findElement(By.id('inputEmail')).sendKeys(test_email)
+        await driver.findElement(By.id('inputPassword')).sendKeys(test_password)
+        await driver.findElement(By.id('loginButton')).click();
+        await driver.wait(until.elementLocated(By.id('dashboardHeader')));
+
+        // Inputting People Tests
+        await driver.wait(until.elementLocated(By.id('addPersonButton')));
+        let addPersonButton = await driver.findElement(By.id('addPersonButton'));
+        await addPersonButton.click();
+
+        await driver.wait(until.elementLocated(By.id('inputPersonName')));
+        let inputName = await driver.findElement(By.id('inputPersonName'));
+        await inputName.sendKeys('User1');
+
+        await driver.wait(until.elementLocated(By.id('addPersonSubmit')));
+        await driver.findElement(By.id('addPersonSubmit')).click();
+
+        await driver.wait(until.elementLocated(By.id('User1 Rename')));
+        await driver.findElement(By.id('User1 Rename')).click();
+        await driver.wait(until.elementLocated(By.id('inputPersonName')));
+        inputName = await driver.findElement(By.id('inputPersonName'));
+        await inputName.clear();
+        await inputName.sendKeys('User1.1');
+
+        await driver.wait(until.elementLocated(By.id('renamePersonSubmit')));
+        await driver.findElement(By.id('renamePersonSubmit')).click();
+
+        await driver.wait(until.elementLocated(By.id('User1.1 Name')));
+        let userRename = await driver.findElement(By.id('User1.1 Name')).getText();
+        expect(userRename).toBe('User1.1');
 
         // Quitting Selenium Driver
         await driver.quit();

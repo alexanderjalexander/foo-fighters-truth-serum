@@ -1,7 +1,10 @@
 import React from "react";
-import {ListGroup, Spinner, Badge} from "react-bootstrap";
+import {ListGroup, Spinner, Badge, Button} from "react-bootstrap";
 import {useGetAllPeopleQuery} from "../query/people";
 import AddPerson from "../components/modal/addPerson";
+import RenamePerson from "../components/modal/renamePerson";
+import {faPenToSquare} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 const Dashboard = ({loginHandler}) => {
     // Obtaining People Query
@@ -10,6 +13,11 @@ const Dashboard = ({loginHandler}) => {
         error,
         refetch,
         data} = useGetAllPeopleQuery();
+
+
+    // Modal States and Form Control
+    const addPersonComponents = AddPerson(refetch);
+    const renamePersonComponents = RenamePerson(refetch);
 
     // Displaying the People
     let people;
@@ -42,21 +50,28 @@ const Dashboard = ({loginHandler}) => {
                 {data.length === 0
                     ? (<p>No people yet! Add a person with the 'Add' button at the top.</p>)
                     : data.map((person) => (
+                    <div className='d-flex flex-row'>
                         <ListGroup.Item id={`${person.name}`}
                                         className='text-start'
                                         href={`/${person._id}`}
                                         key={person.name}
                                         action>
-                            {person.name}
+                            <p id={`${person.name} Name`}>{person.name}</p>
                             <Badge className='m-1' bg='primary'>{person.numDetections}</Badge>
                         </ListGroup.Item>
+                        <Button className='m-1 z-3' size='sm' variant='secondary' id={`${person.name} Rename`}
+                                onClick={() => {renamePersonComponents.setRenamePerson({
+                                    ...renamePersonComponents.renamePerson,
+                                    name:person.name, modalShow: true,
+                                    old_name: person.name, id:person._id
+                                })}}>
+                            <FontAwesomeIcon icon={faPenToSquare}/>
+                        </Button>
+                    </div>
                     ))}
             </ListGroup>
         )
     }
-
-    // Modal States and Form Control
-    const addPersonComponents = AddPerson(refetch);
 
     return (
         <div>
@@ -80,6 +95,7 @@ const Dashboard = ({loginHandler}) => {
                 </div>
             </div>
             {addPersonComponents.addPersonModal}
+            {renamePersonComponents.renamePersonModal}
         </div>
     )
 }

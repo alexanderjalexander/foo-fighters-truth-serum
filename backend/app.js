@@ -24,6 +24,7 @@ app.use(
     },
   })
 );
+app.use((req, res, next) => (req.session.user = { _id: "6615c2b8f7472746c8522074" }, next()));
 configRoutes(app);
 // eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {

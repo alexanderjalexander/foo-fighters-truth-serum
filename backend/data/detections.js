@@ -5,6 +5,7 @@ import { StatusError, requireData, requireId, requireString } from "../validatio
 import { getPersonById } from "./people.js";
 import { getSessionById } from './sessions.js';
 
+/** @type {tf.LayersModel} */
 let model;
 if (process.env.NODE_ENV !== 'test')
   setTimeout(async () => (model = await tf.loadLayersModel("http://localhost:4000/api/model/model.json")), 3000);
@@ -54,7 +55,6 @@ export const createDetection = async (userId, personId, sessionId, name, data, t
       throw new StatusError(404, "Session does not exist.");
   }
   name = requireString(name, "Detection name");
-  data = requireData(data);
   const person = await getPersonById(userId, personId);
   if (!person) throw new StatusError(404, "Person does not exist.");
 
@@ -233,14 +233,39 @@ export const moveToSession = async (userId, detectionId, sessionId) => {
 
 /**
  * Runs the prediction model on a given file.
- * @param {any} file A file object straight from the web request
+ * @param {Buffer} fileBuffer A file buffer object straight from the web request
  */
-export const runDetection = async (file) => {
-  const data = file.buffer.toString().trim().split('\n').map(line =>
-    line.trim().split(',').map(v=>+v)
-  );
-  if (isNaN(data[0][0])) data.shift();
+export const runDetection = async (fileBuffer) => {
+  const data = requireData(fileBuffer);
   const prediction = model.predict(tf.tensor3d([data]));
   const result = await prediction.data();
   return [result[1] > result[0], Math.max(result[0], result[1])];
-}
+};
+
+/**
+ * Refit the model based on currently flagged detections.
+ */
+export const refit = async () => {
+  const detectionsCol = await detections();
+  const flaggedDetections = await detectionsCol.find({ flagged: true }).toArray();
+  const x = [];
+  const y = [];
+  for (const { truth, data } of flaggedDetections) {
+    x.push(requireData(data));
+    y.push([+!truth, +truth]);
+  }
+
+  await model.fit(x, y);
+
+  // Flip all the flagged detections to the correct value now that
+  // they've been used, and unflag them
+  detectionsCol.updateMany(
+    { flagged: true },
+    [{
+      $set: {
+        flagged: false,
+        truth: { $not: "$truth" }
+      }
+    }]
+  );
+};

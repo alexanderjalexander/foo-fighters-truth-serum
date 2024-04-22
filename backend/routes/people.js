@@ -48,14 +48,13 @@ router.post('/:personId/detections', multer().single('file'), checkAuth, sync(as
   const now = new Date();
   const detectionName = req.body.name || `New Detection (${now.toDateString()} ${now.toTimeString()})`;
   const sessionId = req.body.sessionId;
-
-  const [truth, confidence] = await runDetection(file);
+  const [truth, confidence] = await runDetection(file.buffer);
   await createDetection(
     req.session.user._id,
     req.params.personId,
     sessionId,
     detectionName,
-    file,
+    file.buffer,
     truth,
     confidence
   );

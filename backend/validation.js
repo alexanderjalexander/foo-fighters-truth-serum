@@ -94,9 +94,25 @@ export const checkPersonName = (name) => {
 
 /**
  * Checks that uploaded detection data is valid.
- * @param {any} data The data
- * @returns 
+ * @param {Buffer} data The raw buffer with the data
+ * @returns {number[][]} The parsed data
  */
 export const requireData = (data) => {
-  return data;
+  if (!Buffer.isBuffer(data))
+    throw new StatusError(400, 'Must submit a file.');
+  const lines = data.toString().trim().split('\n');
+  // Discard header row if present (detect by NaN prescence in first row)
+  if (isNaN(lines[0].split(',')[0])) lines.shift();
+  if (lines.length != 9600)
+    throw new StatusError(400, `Expected 9600 rows of data, received ${lines.length}`);
+  return lines.map((line, i) => {
+    const cols = line.trim().split(',');
+    if (cols.length != 5)
+      throw new StatusError(400, `Expected 5 columns of data per row, but row ${i + 1} has ${cols.length}`);
+    for (let j = 0; j < 5; j++) {
+      if (isNaN(cols[j] = +cols[j]))
+        throw new StatusError(400, `Not a number at row ${i + 1}, column ${j + 1}`);
+    }
+    return cols;
+  });
 };

@@ -25,6 +25,8 @@ const Dashboard = ({loginHandler}) => {
     const addPersonComponents = AddPerson(refetch);
     const renamePersonComponents = RenamePerson(refetch);
 
+    const nav = (href) => () => navigate(href);
+
     // Displaying the People
     let people;
     let pageButtons;
@@ -65,7 +67,6 @@ const Dashboard = ({loginHandler}) => {
             const start = Math.min(index, lastPage) * pageSize;
             const hasBack = index > 0;
             const hasForward = index < lastPage;
-            const nav = (href) => () => navigate(href);
             pageButtons = (
                 <Pagination>
                     {page > 2 && <Pagination.First onClick={nav("/1")} />}
@@ -83,7 +84,7 @@ const Dashboard = ({loginHandler}) => {
                         <div key={person._id} className='d-flex flex-row'>
                             <ListGroup.Item id={`${person.name}`}
                                             className='d-flex align-items-baseline justify-content-between'
-                                            href={`/person/${person._id}`}
+                                            onClick={nav(`/person/${person._id}`)}
                                             key={person.name}
                                             action>
                                 <span id={`${person.name} Name`} className='m-0'>

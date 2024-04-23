@@ -82,21 +82,25 @@ const Dashboard = ({loginHandler}) => {
                     {data.slice(start, start + pageSize).map((person) => (
                         <div key={person._id} className='d-flex flex-row'>
                             <ListGroup.Item id={`${person.name}`}
-                                            className='text-start'
+                                            className='d-flex align-items-baseline justify-content-between'
                                             href={`/person/${person._id}`}
                                             key={person.name}
                                             action>
-                                <p id={`${person.name} Name`}>{person.name}</p>
-                                <Badge className='m-1' bg='primary'>{person.numDetections}</Badge>
+                                <span id={`${person.name} Name`} className='m-0'>
+                                    {person.name}
+                                    <Badge className='m-1' bg='primary'>{person.numDetections}</Badge>
+                                </span>
+                                <Button className='m-1 z-3' size='sm' variant='secondary' id={`${person.name} Rename`}
+                                        onClickCapture={(event) => {
+                                            event.stopPropagation();
+                                            renamePersonComponents.setRenamePerson({
+                                                ...renamePersonComponents.renamePerson,
+                                                name:person.name, modalShow: true,
+                                                old_name: person.name, id:person._id
+                                            })}}>
+                                    <FontAwesomeIcon icon={faPenToSquare}/>
+                                </Button>
                             </ListGroup.Item>
-                            <Button className='m-1 z-3' size='sm' variant='secondary' id={`${person.name} Rename`}
-                                    onClick={() => {renamePersonComponents.setRenamePerson({
-                                        ...renamePersonComponents.renamePerson,
-                                        name:person.name, modalShow: true,
-                                        old_name: person.name, id:person._id
-                                    })}}>
-                                <FontAwesomeIcon icon={faPenToSquare}/>
-                            </Button>
                         </div>
                     ))}
                 </ListGroup>

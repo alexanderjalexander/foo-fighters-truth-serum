@@ -1,12 +1,18 @@
 import React from "react";
-import {ListGroup, Spinner, Badge, Button} from "react-bootstrap";
+import {ListGroup, Spinner, Badge, Button, Pagination} from "react-bootstrap";
 import {useGetAllPeopleQuery} from "../query/people";
 import AddPerson from "../components/modal/addPerson";
 import RenamePerson from "../components/modal/renamePerson";
 import {faPenToSquare} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { useNavigate, useParams } from "react-router-dom";
+
+const pageSize = 6;
 
 const Dashboard = ({loginHandler}) => {
+    const params = useParams();
+    const navigate = useNavigate();
+    let page = Math.max(+params.page || 1, 1);
     // Obtaining People Query
     const {isPending,
         isError,
@@ -21,6 +27,7 @@ const Dashboard = ({loginHandler}) => {
 
     // Displaying the People
     let people;
+    let pageButtons;
     if (isPending) {
         people = (
             <Spinner animation='border' role="status">
@@ -45,32 +52,56 @@ const Dashboard = ({loginHandler}) => {
         )
     }
     else {
-        people = (
-            <ListGroup className='w-100'>
-                {data.length === 0
-                    ? (<p>No people yet! Add a person with the 'Add' button at the top.</p>)
-                    : data.map((person) => (
-                    <div className='d-flex flex-row'>
-                        <ListGroup.Item id={`${person.name}`}
-                                        className='text-start'
-                                        href={`/${person._id}`}
-                                        key={person.name}
-                                        action>
-                            <p id={`${person.name} Name`}>{person.name}</p>
-                            <Badge className='m-1' bg='primary'>{person.numDetections}</Badge>
-                        </ListGroup.Item>
-                        <Button className='m-1 z-3' size='sm' variant='secondary' id={`${person.name} Rename`}
-                                onClick={() => {renamePersonComponents.setRenamePerson({
-                                    ...renamePersonComponents.renamePerson,
-                                    name:person.name, modalShow: true,
-                                    old_name: person.name, id:person._id
-                                })}}>
-                            <FontAwesomeIcon icon={faPenToSquare}/>
-                        </Button>
-                    </div>
+        if (data.length === 0) {
+            people = (
+                <ListGroup className='w-100'>
+                    <p>No people yet! Add a person with the 'Add' button at the top.</p>
+                </ListGroup>
+            );
+        } else {
+            const index = page - 1;
+            const lastPage = Math.floor((data.length - 1) / pageSize);
+            page = Math.min(page, lastPage + 1);
+            const start = Math.min(index, lastPage) * pageSize;
+            const hasBack = index > 0;
+            const hasForward = index < lastPage;
+            const nav = (href) => () => navigate(href);
+            pageButtons = (
+                <Pagination>
+                    {page > 2 && <Pagination.First onClick={nav("/1")} />}
+                    {hasBack && <Pagination.Prev onClick={nav(`/${page - 1}`)} />}
+                    {hasBack && <Pagination.Item onClick={nav(`/${page - 1}`)} >{page - 1}</Pagination.Item>}
+                    <Pagination.Item active>{page}</Pagination.Item>
+                    {hasForward && <Pagination.Item onClick={nav(`/${page + 1}`)} >{page + 1}</Pagination.Item>}
+                    {hasForward && <Pagination.Next onClick={nav(`/${page + 1}`)} />}
+                    {page < lastPage && <Pagination.Last onClick={nav(`/${lastPage + 1}`)} />}
+                </Pagination>
+            );
+            people = (
+                <ListGroup className='w-100'>
+                    {data.slice(start, start + pageSize).map((person) => (
+                        <div key={person._id} className='d-flex flex-row'>
+                            <ListGroup.Item id={`${person.name}`}
+                                            className='text-start'
+                                            href={`/person/${person._id}`}
+                                            key={person.name}
+                                            action>
+                                <p id={`${person.name} Name`}>{person.name}</p>
+                                <Badge className='m-1' bg='primary'>{person.numDetections}</Badge>
+                            </ListGroup.Item>
+                            <Button className='m-1 z-3' size='sm' variant='secondary' id={`${person.name} Rename`}
+                                    onClick={() => {renamePersonComponents.setRenamePerson({
+                                        ...renamePersonComponents.renamePerson,
+                                        name:person.name, modalShow: true,
+                                        old_name: person.name, id:person._id
+                                    })}}>
+                                <FontAwesomeIcon icon={faPenToSquare}/>
+                            </Button>
+                        </div>
                     ))}
-            </ListGroup>
-        )
+                </ListGroup>
+            );
+        }
     }
 
     return (
@@ -90,8 +121,9 @@ const Dashboard = ({loginHandler}) => {
                     <header id='peopleHeader' className="fs-1">People</header>
                     {addPersonComponents.addPersonButton}
                 </div>
-                <div className="d-flex gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
+                <div className="d-flex flex-column gap-2 mx-auto w-75 text-center justify-content-center align-items-center">
                     {people}
+                    {pageButtons}
                 </div>
             </div>
             {addPersonComponents.addPersonModal}

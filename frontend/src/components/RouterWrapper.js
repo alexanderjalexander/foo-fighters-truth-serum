@@ -28,6 +28,11 @@ export default function RouterWrapper() {
             errorElement: <ErrorBoundary />
         },
         {
+            path: '/:page',
+            element: <Home />,
+            errorElement: <ErrorBoundary />
+        },
+        {
             path: '/login',
             element: <Login />
         },
@@ -36,7 +41,7 @@ export default function RouterWrapper() {
             element: <Register />
         },
         {
-            path: '/:id',
+            path: '/person/:id',
             element: <Person />,
             errorElement: <ErrorBoundary />
         }

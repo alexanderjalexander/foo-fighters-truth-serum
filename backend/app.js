@@ -28,7 +28,7 @@ configRoutes(app);
 // eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {
   const status = err.status || 500;
-  const message = (err.status !== 500 && err.message) || 'Internal Server Error';
+  const message = (status !== 500 && err.message) || 'Internal Server Error';
   if (status === 500) {
     console.error(err);
   }

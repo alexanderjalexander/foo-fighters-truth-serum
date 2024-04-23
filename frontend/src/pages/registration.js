@@ -45,7 +45,7 @@ const Register = () => {
             login();
         } catch(e) {
             console.error("Registration Form Mutation Failed");
-            setServerError(e.status + ':' + e.message)
+            setServerError(e.message)
         }
         setButtonDisabled(false);
     }

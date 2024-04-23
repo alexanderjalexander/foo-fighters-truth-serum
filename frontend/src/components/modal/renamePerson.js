@@ -25,7 +25,7 @@ export default function RenamePerson(refetch) {
             });
         } catch (e) {
             console.error('Rename Person Form Mutation Failed');
-            setRenamePerson({...renamePerson, renameError: (e.status + ':' + e.message)});
+            setRenamePerson({...renamePerson, renameError: (e.message)});
         }
     };
 

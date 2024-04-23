@@ -20,7 +20,7 @@ export function EditSession(id, personDataQuery) {
             setEditSession({name: '', showModal: false, sessionId: '', prev_name: '', error: '', editing: false});
         } catch (e) {
             console.error('Edit Session Form Mutation Failed');
-            setEditSession({...editSession, error: (e.status + ':' + e.message)});
+            setEditSession({...editSession, error: (e.message)});
         }
     }
 

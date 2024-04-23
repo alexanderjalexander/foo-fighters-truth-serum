@@ -20,7 +20,7 @@ export function AddSession(id, personDataQuery) {
             setAddSession({name: '', error: '', showModal: false, adding: false});
         } catch (e) {
             console.error('Add Session Form Mutation Failed');
-            setAddSession({...addSession, error: (e.status + ':' + e.message)});
+            setAddSession({...addSession, error: (e.message)});
         }
     }
 

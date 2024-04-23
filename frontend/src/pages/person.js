@@ -131,7 +131,7 @@ const Person = () => {
         detections = (
             <div>
                 <header className="fs-1">Error</header>
-                <p>{personDataQuery.error.status}: {personDataQuery.error.message}</p>
+                <p>{personDataQuery.error.message}</p>
             </div>
         );
     }

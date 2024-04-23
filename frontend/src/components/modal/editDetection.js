@@ -24,7 +24,7 @@ export default function EditDetection(id, personDataQuery, sessions) {
             setEditDetection({id:'', name:'', prev_name: '', comment:'', error:'', sessionId: '', editing:false, showModal:false})
         } catch (e) {
             console.error('Edit Detection Form Mutation Failed');
-            setEditDetection({...editDetection, error: (e.status + ':' + e.message)});
+            setEditDetection({...editDetection, error: (e.message)});
         }
     }
 

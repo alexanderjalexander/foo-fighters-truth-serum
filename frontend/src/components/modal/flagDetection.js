@@ -18,7 +18,7 @@ export default function FlagDetection(id, personDataQuery) {
         } catch (e) {
 
             console.error('Edit Detection Form Mutation Failed');
-            setFlagDetection({...flagDetection, error: (e.status + ':' + e.message)})
+            setFlagDetection({...flagDetection, error: (e.message)})
         }
     }
 

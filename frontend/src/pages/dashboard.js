@@ -41,7 +41,7 @@ const Dashboard = ({loginHandler}) => {
         people = (
             <div>
                 <header className="fs-1">Error</header>
-                <p>{error.status}: {error.message}</p>
+                <p>{error.message}</p>
             </div>
         )
     }
@@ -87,10 +87,12 @@ const Dashboard = ({loginHandler}) => {
                                             onClick={nav(`/person/${person._id}`)}
                                             key={person.name}
                                             action>
-                                <span id={`${person.name} Name`} className='m-0'>
-                                    {person.name}
+                                <div>
+                                    <span id={`${person.name} Name`} className='m-0'>
+                                        {person.name}
+                                    </span>
                                     <Badge className='m-1' bg='primary'>{person.numDetections}</Badge>
-                                </span>
+                                </div>
                                 <Button className='m-1 z-3' size='sm' variant='secondary' id={`${person.name} Rename`}
                                         onClickCapture={(event) => {
                                             event.stopPropagation();

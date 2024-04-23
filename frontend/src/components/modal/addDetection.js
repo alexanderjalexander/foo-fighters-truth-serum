@@ -21,7 +21,7 @@ export default function AddDetection(id, personDataQuery, sessions) {
             console.log('Succeeded');
         } catch (e) {
             console.error('Add Detection Form Mutation Failed');
-            setAddDetection({...addDetection, error: (e.status + ':' + e.message)});
+            setAddDetection({...addDetection, error: e.message});
         }
     }
 

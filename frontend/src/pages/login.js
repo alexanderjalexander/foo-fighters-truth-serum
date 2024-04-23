@@ -45,7 +45,7 @@ const Login = () => {
             navigate('/');
         } catch(e) {
             console.error("Login Form Mutation Failed");
-            setServerError(e.status + ':' + e.message)
+            setServerError(e.message)
         }
         setButtonDisabled(false);
     }

@@ -23,7 +23,7 @@ export default function AddPerson(refetch) {
             setAddPerson({modalShow: false, name: '', addError: '', addDisabled: false});
         } catch (e) {
             console.error('Add Person Form Mutation Failed');
-            setAddPerson({...addPerson, addError: (e.status + ':' + e.message)});
+            setAddPerson({...addPerson, addError: (e.message)});
         }
     };
 

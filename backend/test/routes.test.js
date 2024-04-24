@@ -157,3 +157,8 @@ test("GET /api/people/:personId", async () => {
     name: "New Guy"
   });
 });
+
+test("GET /api/people/:personId bad ID", async () => {
+  const res = await agent.get(`/api/people/111111111111111111111111`);
+  expect(res.status).toBe(404);
+});

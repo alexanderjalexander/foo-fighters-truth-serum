@@ -5,6 +5,7 @@ import { checkAuth, sync } from "./middleware.js";
 import multer from "multer";
 import { createDetection, runDetection } from "../data/detections.js";
 import sessionsRouter from "./sessions.js";
+import { StatusError } from "../validation.js";
 
 const router = Router();
 
@@ -21,7 +22,8 @@ router.get('/', checkAuth, sync(async (req, res) => {
 }));
 
 router.get('/:personId', checkAuth, sync(async (req, res) => {
-  const { name } = await getPersonById(req.session.user._id, req.params.personId);
+  const person = await getPersonById(req.session.user._id, req.params.personId);
+  if (!person) throw new StatusError(404, 'Person not found.');
   const detections = await getAllDetections(req.session.user._id, req.params.personId);
   const sessions = await getAllSessions(req.session.user._id, req.params.personId);
   const binned = detections.reduce((bins, detection) => {
@@ -31,7 +33,7 @@ router.get('/:personId', checkAuth, sync(async (req, res) => {
     return bins;
   }, {});
   res.status(200).json({
-    name,
+    name: person.name,
     detections: binned,
     sessions
   })

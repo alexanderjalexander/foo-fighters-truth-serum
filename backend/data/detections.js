@@ -1,14 +1,13 @@
-import * as tf from '@tensorflow/tfjs';
+import * as tf from '@tensorflow/tfjs-node';
 import { ObjectId } from "mongodb";
 import { detections, users } from "../config/mongo.js";
 import { StatusError, requireData, requireId, requireString } from "../validation.js";
 import { getPersonById } from "./people.js";
 import { getSessionById } from './sessions.js';
 
-/** @type {tf.LayersModel} */
-let model;
-if (process.env.NODE_ENV !== 'test')
-  setTimeout(async () => (model = await tf.loadLayersModel("http://localhost:4000/api/model/model.json")), 3000);
+const modelPath = "file://./model/model.json";
+const model = await tf.loadLayersModel(modelPath);
+const maxFlagged = process.env.MAX_FLAGGED || 20;
 
 /**
  * @typedef Detection
@@ -155,6 +154,17 @@ export const flagDetection = async (id) => {
   if (!detectionRes.acknowledged)
     throw new Error("Failed to flag detection.")
 
+  try {
+    const existingFlags = await detectionsCol.countDocuments({ flagged: true })
+    if (existingFlags > maxFlagged) refit().catch(e => {
+      console.error("Failed to run refitting task. See below error:");
+      console.error(e);
+    });
+  } catch (e) {
+    console.error("Failed to run refitting task. See below error:");
+    console.error(e);
+  }
+
   return await getDetection(id);
 };
 
@@ -234,6 +244,7 @@ export const moveToSession = async (userId, detectionId, sessionId) => {
 /**
  * Runs the prediction model on a given file.
  * @param {Buffer} fileBuffer A file buffer object straight from the web request
+ * @model This method must be updated with the correct input and output shape if the mode is changed.
  */
 export const runDetection = async (fileBuffer) => {
   const data = requireData(fileBuffer);
@@ -244,6 +255,7 @@ export const runDetection = async (fileBuffer) => {
 
 /**
  * Refit the model based on currently flagged detections.
+ * @model This method must be updated with the correct input shape if the model is changed.
  */
 export const refit = async () => {
   const detectionsCol = await detections();
@@ -255,11 +267,16 @@ export const refit = async () => {
     y.push([+!truth, +truth]);
   }
 
-  await model.fit(x, y);
+  model.compile({
+    optimizer: 'adam',
+    loss: 'categoricalCrossentropy',
+    metric: ['accuracy']
+  });
+  await model.fit(tf.tensor3d(x), tf.tensor2d(y));
 
   // Flip all the flagged detections to the correct value now that
   // they've been used, and unflag them
-  detectionsCol.updateMany(
+  await detectionsCol.updateMany(
     { flagged: true },
     [{
       $set: {

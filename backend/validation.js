@@ -41,7 +41,7 @@ export const checkEmail = (value) => {
   value = requireString(value, 'Email');
   if (!(/^[^@]+@[a-z0-9.-]+\.[a-z]{2,}$/i).test(value))
     throw new StatusError(400, "Provided email address isn't valid.");
-  return value;
+  return value.toLowerCase();
 };
 
 /**
@@ -96,10 +96,9 @@ export const checkPersonName = (name) => {
  * Checks that uploaded detection data is valid.
  * @param {Buffer} data The raw buffer with the data
  * @returns {number[][]} The parsed data
+ * @model This method must be update to correctly validate input data if the model is changed.
  */
 export const requireData = (data) => {
-  if (!Buffer.isBuffer(data))
-    throw new StatusError(400, 'Must submit a file.');
   const lines = data.toString().trim().split('\n');
   // Discard header row if present (detect by NaN prescence in first row)
   if (isNaN(lines[0].split(',')[0])) lines.shift();

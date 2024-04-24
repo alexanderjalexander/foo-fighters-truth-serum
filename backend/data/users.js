@@ -46,6 +46,7 @@ export const createUser = async (email, password) => {
  * @returns {Promise<User?>}
  */
 export const verifyUser = async (email, password) => {
+  email = checkEmail(email);
   const usersCol = await users();
   /** @type {User?} */
   const user = await usersCol.findOne({ email });

@@ -12,8 +12,8 @@ let _db;
  */
 export const dbConnection = async () => {
   if (!_conn) {
-    _conn = await MongoClient.connect(process.env.CONNECTION_URI);
-    _db = _conn.db(process.env.DATABASE);
+    _conn = await MongoClient.connect(process.env.CONNECTION_URI || 'mongodb://127.0.0.1:27017');
+    _db = _conn.db(process.env.DATABASE || 'truth_serum');
   }
 
   return _db;
